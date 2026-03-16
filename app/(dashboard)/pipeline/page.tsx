@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Plus, MoreHorizontal, List, Columns, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   DropdownMenu,
@@ -35,7 +36,9 @@ function StatoBadge({ stato }: { stato: string }) {
     "Non interessato": "bg-red-900/40 text-red-400",
   };
   return (
-    <span className={`inline-flex px-2 py-0.5 rounded text-xs font-medium ${colors[stato] ?? "bg-gray-800 text-gray-300"}`}>
+    <span
+      className={`inline-flex px-2 py-0.5 rounded text-xs font-medium ${colors[stato] ?? "bg-gray-800 text-gray-300"}`}
+    >
       {stato || "-"}
     </span>
   );
@@ -43,7 +46,10 @@ function StatoBadge({ stato }: { stato: string }) {
 
 function formatDate(d: string) {
   if (!d) return "-";
-  return new Date(d).toLocaleDateString("it-IT", { day: "2-digit", month: "short" });
+  return new Date(d).toLocaleDateString("it-IT", {
+    day: "2-digit",
+    month: "short",
+  });
 }
 
 const KANBAN_COLS = [
@@ -65,16 +71,24 @@ export default function PipelinePage() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<"table" | "kanban">("table");
-  const [filters, setFilters] = useState({ settore: "", stato: "", territorio: "", score: "" });
+  const [filters, setFilters] = useState({
+    settore: "",
+    stato: "",
+    territorio: "",
+    score: "",
+  });
 
   async function loadLeads() {
     setLoading(true);
     try {
       const params = new URLSearchParams();
-      if (filters.settore && filters.settore !== "all") params.set("settore", filters.settore);
-      if (filters.stato && filters.stato !== "all") params.set("stato", filters.stato);
+      if (filters.settore && filters.settore !== "all")
+        params.set("settore", filters.settore);
+      if (filters.stato && filters.stato !== "all")
+        params.set("stato", filters.stato);
       if (filters.territorio) params.set("territorio", filters.territorio);
-      if (filters.score && filters.score !== "all") params.set("score", filters.score);
+      if (filters.score && filters.score !== "all")
+        params.set("score", filters.score);
       const res = await fetch(`/api/leads?${params}`);
       if (!res.ok) throw new Error();
       setLeads(await res.json());
@@ -85,7 +99,9 @@ export default function PipelinePage() {
     }
   }
 
-  useEffect(() => { loadLeads(); }, [filters]);
+  useEffect(() => {
+    loadLeads();
+  }, [filters]);
 
   async function markAcquired(id: string) {
     try {
@@ -118,94 +134,130 @@ export default function PipelinePage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-[#f5f5f5]">Pipeline</h1>
-          <p className="text-[#888] text-sm mt-1">{leads.length} lead totali</p>
+          <h1 className="text-2xl font-bold text-[#f5f5f5] tracking-tight">
+            Pipeline
+          </h1>
+          <p className="text-[#555] text-xs mt-1 uppercase tracking-widest">
+            {leads.length} lead totali
+          </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setView("table")}
-            className={view === "table" ? "text-[#c9a96e]" : "text-[#888]"}
-            title="Vista tabella"
-          >
-            <List size={18} />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setView("kanban")}
-            className={view === "kanban" ? "text-[#c9a96e]" : "text-[#888]"}
-            title="Vista kanban"
-          >
-            <Columns size={18} />
-          </Button>
+          <div className="flex items-center bg-white/5 rounded-lg p-1 border border-white/5">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setView("table")}
+              className={cn(
+                "h-8 gap-2",
+                view === "table"
+                  ? "bg-[#c9a96e]/10 text-[#c9a96e]"
+                  : "text-[#888]",
+              )}
+            >
+              <List size={16} />
+              <span className="text-xs hidden sm:inline">Lista</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setView("kanban")}
+              className={cn(
+                "h-8 gap-2",
+                view === "kanban"
+                  ? "bg-[#c9a96e]/10 text-[#c9a96e]"
+                  : "text-[#888]",
+              )}
+            >
+              <Columns size={16} />
+              <span className="text-xs hidden sm:inline">Kanban</span>
+            </Button>
+          </div>
           {canEdit && (
             <Button
+              size="sm"
               onClick={() => router.push("/pipeline/new")}
-              className="bg-[#c9a96e] hover:bg-[#b8945a] text-[#0a0a0a] font-medium"
+              className="bg-[#c9a96e] hover:bg-[#b8945a] text-[#0a0a0a] font-bold h-8"
             >
-              <Plus size={16} className="mr-1" /> Nuovo Lead
+              <Plus size={16} className="mr-1" /> Nuovo
             </Button>
           )}
         </div>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap gap-3 items-center">
-        <Filter size={16} className="text-[#888]" />
+      <div className="grid grid-cols-2 md:flex md:flex-wrap gap-2 md:gap-3 items-center">
+        <div className="flex items-center gap-2 col-span-2 md:col-auto mb-1 md:mb-0">
+          <Filter size={14} className="text-[#555]" />
+          <span className="text-[10px] uppercase text-[#555] font-bold tracking-widest hidden md:inline">
+            Filtri
+          </span>
+        </div>
         <Select
           value={filters.settore || "all"}
-          onValueChange={(v) => setFilters((f) => ({ ...f, settore: v === "all" ? "" : v }))}
+          onValueChange={(v) =>
+            setFilters((f) => ({ ...f, settore: v === "all" ? "" : v }))
+          }
         >
-          <SelectTrigger className="w-40 bg-[#141414] border-[#1f1f1f] text-sm">
+          <SelectTrigger className="glass border-white/5 text-xs h-9">
             <SelectValue placeholder="Settore" />
           </SelectTrigger>
-          <SelectContent className="bg-[#141414] border-[#1f1f1f]">
+          <SelectContent className="glass-dark border-white/10">
             <SelectItem value="all">Tutti i settori</SelectItem>
             {SETTORI.map((s) => (
-              <SelectItem key={s} value={s}>{s}</SelectItem>
+              <SelectItem key={s} value={s}>
+                {s}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
 
         <Select
           value={filters.stato || "all"}
-          onValueChange={(v) => setFilters((f) => ({ ...f, stato: v === "all" ? "" : v }))}
+          onValueChange={(v) =>
+            setFilters((f) => ({ ...f, stato: v === "all" ? "" : v }))
+          }
         >
-          <SelectTrigger className="w-44 bg-[#141414] border-[#1f1f1f] text-sm">
+          <SelectTrigger className="glass border-white/5 text-xs h-9">
             <SelectValue placeholder="Stato" />
           </SelectTrigger>
-          <SelectContent className="bg-[#141414] border-[#1f1f1f]">
+          <SelectContent className="glass-dark border-white/10">
             <SelectItem value="all">Tutti gli stati</SelectItem>
             {STATI_LEAD.map((s) => (
-              <SelectItem key={s} value={s}>{s}</SelectItem>
+              <SelectItem key={s} value={s}>
+                {s}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
 
         <Select
           value={filters.score || "all"}
-          onValueChange={(v) => setFilters((f) => ({ ...f, score: v === "all" ? "" : v }))}
+          onValueChange={(v) =>
+            setFilters((f) => ({ ...f, score: v === "all" ? "" : v }))
+          }
         >
-          <SelectTrigger className="w-36 bg-[#141414] border-[#1f1f1f] text-sm">
+          <SelectTrigger className="glass border-white/5 text-xs h-9">
             <SelectValue placeholder="Score" />
           </SelectTrigger>
-          <SelectContent className="bg-[#141414] border-[#1f1f1f]">
+          <SelectContent className="glass-dark border-white/10">
             <SelectItem value="all">Tutti gli score</SelectItem>
             {SCORE_OPTIONS.map((s) => (
-              <SelectItem key={s} value={s}>{s}</SelectItem>
+              <SelectItem key={s} value={s}>
+                {s}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
 
         <Input
-          placeholder="Filtra territorio..."
+          placeholder="Territorio..."
           value={filters.territorio}
-          onChange={(e) => setFilters((f) => ({ ...f, territorio: e.target.value }))}
-          className="w-48 bg-[#141414] border-[#1f1f1f] text-sm"
+          onChange={(e) =>
+            setFilters((f) => ({ ...f, territorio: e.target.value }))
+          }
+          className="glass border-white/5 text-xs h-9 col-span-1"
         />
       </div>
 
@@ -214,7 +266,12 @@ export default function PipelinePage() {
           <div className="w-8 h-8 border-2 border-[#c9a96e] border-t-transparent rounded-full animate-spin" />
         </div>
       ) : view === "table" ? (
-        <TableView leads={leads} canEdit={canEdit} onMarkAcquired={markAcquired} onArchive={archiveLead} />
+        <TableView
+          leads={leads}
+          canEdit={canEdit}
+          onMarkAcquired={markAcquired}
+          onArchive={archiveLead}
+        />
       ) : (
         <KanbanView leads={leads} />
       )}
@@ -237,61 +294,84 @@ function TableView({
 
   if (leads.length === 0) {
     return (
-      <div className="text-center py-20 text-[#888]">
-        Nessun lead trovato
-      </div>
+      <div className="text-center py-20 text-[#888]">Nessun lead trovato</div>
     );
   }
 
   return (
-    <Card className="bg-[#141414] border-[#1f1f1f] overflow-hidden">
-      <div className="overflow-x-auto">
+    <Card className="glass-dark border-white/5 overflow-hidden">
+      <div className="md:block hidden overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-[#1f1f1f]">
-              {["Nome Azienda", "Settore", "Territorio", "Score", "Stato", "1° Contatto", "Follow-up", "Risposta", ""].map(
-                (h) => (
-                  <th
-                    key={h}
-                    className="text-left px-4 py-3 text-xs text-[#888] font-medium whitespace-nowrap"
-                  >
-                    {h}
-                  </th>
-                )
-              )}
+            <tr className="border-b border-white/5">
+              {[
+                "Nome Azienda",
+                "Settore",
+                "Territorio",
+                "Score",
+                "Stato",
+                "1° Contatto",
+                "Follow-up",
+                "",
+              ].map((h) => (
+                <th
+                  key={h}
+                  className="text-left px-4 py-4 text-[10px] text-[#555] font-bold uppercase tracking-wider whitespace-nowrap"
+                >
+                  {h}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
             {leads.map((lead) => (
               <tr
                 key={lead.id}
-                className="border-b border-[#1f1f1f] last:border-0 hover:bg-[#1a1a1a] transition-colors"
+                className="border-b border-white/5 last:border-0 hover:bg-white/[0.02] transition-colors"
               >
-                <td className="px-4 py-3">
+                <td className="px-4 py-4 text-xs">
                   <Link
                     href={`/pipeline/${lead.id}`}
-                    className="font-medium text-[#f5f5f5] hover:text-[#c9a96e] max-w-[180px] block truncate"
+                    className="font-semibold text-[#f5f5f5] hover:text-[#c9a96e] max-w-[180px] block truncate"
                   >
                     {lead.nomeAzienda || "-"}
                   </Link>
                 </td>
-                <td className="px-4 py-3 text-[#888]">{lead.settore || "-"}</td>
-                <td className="px-4 py-3 text-[#888]">{lead.territorio || "-"}</td>
-                <td className="px-4 py-3 text-sm">{lead.score || "-"}</td>
-                <td className="px-4 py-3"><StatoBadge stato={lead.stato} /></td>
-                <td className="px-4 py-3 text-[#888] whitespace-nowrap">{formatDate(lead.dataPrimoContatto)}</td>
-                <td className="px-4 py-3 text-[#888] whitespace-nowrap">{formatDate(lead.dataFollowUp)}</td>
-                <td className="px-4 py-3 text-[#888] max-w-[120px] truncate">{lead.risposta || "-"}</td>
-                <td className="px-4 py-3">
+                <td className="px-4 py-4 text-[#888] text-xs">
+                  {lead.settore || "-"}
+                </td>
+                <td className="px-4 py-4 text-[#888] text-xs">
+                  {lead.territorio || "-"}
+                </td>
+                <td className="px-4 py-4 text-xs font-bold text-[#c9a96e]">
+                  {lead.score || "-"}
+                </td>
+                <td className="px-4 py-4">
+                  <StatoBadge stato={lead.stato} />
+                </td>
+                <td className="px-4 py-4 text-[#555] text-xs whitespace-nowrap">
+                  {formatDate(lead.dataPrimoContatto)}
+                </td>
+                <td className="px-4 py-4 text-red-400/80 text-xs whitespace-nowrap font-medium">
+                  {formatDate(lead.dataFollowUp)}
+                </td>
+                <td className="px-4 py-4 text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-[#888]">
-                        <MoreHorizontal size={16} />
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-[#555] hover:text-[#f5f5f5]"
+                      >
+                        <MoreHorizontal size={14} />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent className="bg-[#141414] border-[#1f1f1f]" align="end">
+                    <DropdownMenuContent
+                      className="glass-dark border-white/10"
+                      align="end"
+                    >
                       <DropdownMenuItem
-                        className="text-[#f5f5f5] hover:bg-[#1f1f1f] cursor-pointer"
+                        className="text-xs text-[#f5f5f5] hover:bg-white/5 cursor-pointer"
                         onClick={() => router.push(`/pipeline/${lead.id}`)}
                       >
                         Apri dettaglio
@@ -299,19 +379,21 @@ function TableView({
                       {canEdit && (
                         <>
                           <DropdownMenuItem
-                            className="text-[#f5f5f5] hover:bg-[#1f1f1f] cursor-pointer"
-                            onClick={() => router.push(`/pipeline/${lead.id}?generate=1`)}
+                            className="text-xs text-[#f5f5f5] hover:bg-white/5 cursor-pointer"
+                            onClick={() =>
+                              router.push(`/pipeline/${lead.id}?generate=1`)
+                            }
                           >
                             Genera Report
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            className="text-green-400 hover:bg-[#1f1f1f] cursor-pointer"
+                            className="text-xs text-green-400 hover:bg-white/5 cursor-pointer"
                             onClick={() => onMarkAcquired(lead.id)}
                           >
                             Segna Acquisito
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            className="text-red-400 hover:bg-[#1f1f1f] cursor-pointer"
+                            className="text-xs text-red-400 hover:bg-white/5 cursor-pointer"
                             onClick={() => onArchive(lead.id)}
                           >
                             Archivia
@@ -325,6 +407,81 @@ function TableView({
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile view cards for pipeline list */}
+      <div className="md:hidden divide-y divide-white/5">
+        {leads.map((lead) => (
+          <div
+            key={lead.id}
+            className="p-4 hover:bg-white/[0.02] transition-colors relative group"
+          >
+            <Link href={`/pipeline/${lead.id}`} className="block">
+              <div className="flex justify-between items-start mb-2">
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-bold text-[#f5f5f5] text-sm truncate pr-2">
+                    {lead.nomeAzienda}
+                  </h3>
+                  <p className="text-[10px] text-[#555] uppercase tracking-wider">
+                    {lead.settore} · {lead.territorio}
+                  </p>
+                </div>
+                <div className="flex flex-col items-end gap-1">
+                  <StatoBadge stato={lead.stato} />
+                  <span className="text-[10px] font-bold text-[#c9a96e]">
+                    {lead.score || "N/A"}
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-center gap-4 text-[10px] text-[#555] font-medium">
+                <div>
+                  <span className="opacity-50">Contatto:</span>{" "}
+                  {formatDate(lead.dataPrimoContatto)}
+                </div>
+                {lead.dataFollowUp && (
+                  <div>
+                    <span className="opacity-50">Follow-up:</span>{" "}
+                    <span className="text-red-400/80">
+                      {formatDate(lead.dataFollowUp)}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </Link>
+            <div className="absolute right-2 bottom-3">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-[#555]"
+                  >
+                    <MoreHorizontal size={14} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  className="glass-dark border-white/10"
+                  align="end"
+                >
+                  <DropdownMenuItem
+                    className="text-xs"
+                    onClick={() => router.push(`/pipeline/${lead.id}`)}
+                  >
+                    Dettaglio
+                  </DropdownMenuItem>
+                  {canEdit && (
+                    <DropdownMenuItem
+                      className="text-xs text-green-400"
+                      onClick={() => onMarkAcquired(lead.id)}
+                    >
+                      Acquisisci
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+        ))}
       </div>
     </Card>
   );
@@ -350,10 +507,16 @@ function KanbanView({ leads }: { leads: Lead[] }) {
                 {colLeads.map((lead) => (
                   <Link key={lead.id} href={`/pipeline/${lead.id}`}>
                     <div className="bg-[#141414] border border-[#1f1f1f] rounded-lg p-3 hover:border-[#c9a96e]/40 transition-colors cursor-pointer">
-                      <p className="text-sm font-medium text-[#f5f5f5] truncate">{lead.nomeAzienda}</p>
-                      <p className="text-xs text-[#888] mt-1">{lead.settore} · {lead.territorio}</p>
+                      <p className="text-sm font-medium text-[#f5f5f5] truncate">
+                        {lead.nomeAzienda}
+                      </p>
+                      <p className="text-xs text-[#888] mt-1">
+                        {lead.settore} · {lead.territorio}
+                      </p>
                       {lead.score && (
-                        <p className="text-xs text-[#c9a96e] mt-2 font-semibold">{lead.score}</p>
+                        <p className="text-xs text-[#c9a96e] mt-2 font-semibold">
+                          {lead.score}
+                        </p>
                       )}
                     </div>
                   </Link>
