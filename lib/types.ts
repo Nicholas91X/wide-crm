@@ -50,6 +50,7 @@ export const STATI_LEAD = [
   "Da contattare",
   "Contattato",
   "Report in lavorazione",
+  "Report completato",
   "Report inviato",
   "Follow-up",
   "Acquisito",

@@ -259,6 +259,7 @@ function StatoBadge({ stato }: { stato: string }) {
     "Da contattare": "bg-gray-800 text-gray-300",
     Contattato: "bg-blue-900/40 text-blue-400",
     "Report in lavorazione": "bg-yellow-900/40 text-yellow-400",
+    "Report completato": "bg-cyan-900/40 text-cyan-400",
     "Report inviato": "bg-purple-900/40 text-purple-400",
     "Follow-up": "bg-orange-900/40 text-orange-400",
     Acquisito: "bg-green-900/40 text-green-400",

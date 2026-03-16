@@ -120,7 +120,7 @@ Paragrafo di 5-6 righe: situazione attuale in una frase diretta, rischio concret
         });
 
         await updateLead(leadId, {
-          stato: "Report inviato",
+          stato: "Report completato",
           urlReport: `/r/${report.id}`,
         }).catch(() => {});
 

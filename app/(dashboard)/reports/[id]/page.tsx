@@ -22,7 +22,9 @@ import { Report, STATI_REPORT, ESITI_REPORT } from "@/lib/types";
 function formatDate(d: string) {
   if (!d) return "-";
   return new Date(d).toLocaleDateString("it-IT", {
-    day: "2-digit", month: "long", year: "numeric",
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
   });
 }
 
@@ -42,7 +44,9 @@ export default function ReportDetailPage() {
   useEffect(() => {
     async function load() {
       try {
-        const url = token ? `/api/reports/${id}?token=${token}` : `/api/reports/${id}`;
+        const url = token
+          ? `/api/reports/${id}?token=${token}`
+          : `/api/reports/${id}`;
         const res = await fetch(url);
         if (!res.ok) {
           if (token) setInvalidToken(true);
@@ -68,7 +72,7 @@ export default function ReportDetailPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ [field]: value }),
       });
-      setReport((r) => r ? { ...r, [field]: value } : r);
+      setReport((r) => (r ? { ...r, [field]: value } : r));
       toast.success("Aggiornato");
     } catch {
       toast.error("Errore nell'aggiornamento");
@@ -104,7 +108,9 @@ export default function ReportDetailPage() {
   }
 
   if (!report) {
-    return <div className="text-[#888] text-center py-20">Report non trovato</div>;
+    return (
+      <div className="text-[#888] text-center py-20">Report non trovato</div>
+    );
   }
 
   // Public view (token present and valid)
@@ -114,90 +120,112 @@ export default function ReportDetailPage() {
 
   // Authenticated view
   return (
-    <div className="space-y-6 max-w-5xl mx-auto">
+    <div className="space-y-6 max-w-5xl mx-auto px-1 md:px-0">
       <div className="flex items-center gap-3">
         <Button
           variant="ghost"
           size="icon"
           onClick={() => router.push("/reports")}
-          className="text-[#888] hover:text-[#f5f5f5]"
+          className="text-[#555] hover:text-[#f5f5f5] bg-white/5 rounded-full"
         >
-          <ArrowLeft size={18} />
+          <ArrowLeft size={16} />
         </Button>
-        <div>
-          <h1 className="text-xl font-bold text-[#f5f5f5] truncate">{report.titolo}</h1>
-          <p className="text-[#888] text-sm">{report.azienda} · {formatDate(report.dataGenerazione)}</p>
+        <div className="min-w-0 flex-1">
+          <h1 className="text-xl font-bold text-[#f5f5f5] truncate tracking-tight">
+            {report.titolo}
+          </h1>
+          <p className="text-[#555] text-[10px] md:text-xs uppercase tracking-widest">
+            {report.azienda} · {formatDate(report.dataGenerazione)}
+          </p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Report content */}
-        <div className="lg:col-span-3">
-          <Card className="bg-[#141414] border-[#1f1f1f]">
-            <CardContent className="p-6">
-              <div className="prose-report">
-                <ReactMarkdown>{report.contenuto || "*Nessun contenuto disponibile*"}</ReactMarkdown>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Sidebar */}
-        <div className="space-y-4">
-          <Card className="bg-[#141414] border-[#1f1f1f]">
-            <CardHeader>
-              <CardTitle className="text-sm text-[#f5f5f5]">Gestione</CardTitle>
+        {/* Sidebar - Shows first on mobile for quick actions */}
+        <div className="order-1 lg:order-2 space-y-4">
+          <Card className="glass-dark border-white/5">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-[#555]">
+                Stato e Azioni
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-1.5">
-                <Label className="text-xs text-[#888]">Stato</Label>
+              <div className="space-y-1">
+                <Label className="text-[10px] uppercase text-[#555] font-bold tracking-tight">
+                  Stato Invio
+                </Label>
                 <Select
                   value={report.stato || ""}
                   onValueChange={(v) => updateReport("stato", v)}
                   disabled={saving}
                 >
-                  <SelectTrigger className="bg-[#0d0d0d] border-[#1f1f1f] text-[#f5f5f5] h-9">
+                  <SelectTrigger className="glass border-white/5 text-xs h-10">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#141414] border-[#1f1f1f]">
-                    {STATI_REPORT.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                  <SelectContent className="glass-dark border-white/10">
+                    {STATI_REPORT.map((s) => (
+                      <SelectItem key={s} value={s}>
+                        {s}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
 
-              <div className="space-y-1.5">
-                <Label className="text-xs text-[#888]">Esito</Label>
+              <div className="space-y-1">
+                <Label className="text-[10px] uppercase text-[#555] font-bold tracking-tight">
+                  Esito Business
+                </Label>
                 <Select
                   value={report.esito || ""}
                   onValueChange={(v) => updateReport("esito", v)}
                   disabled={saving}
                 >
-                  <SelectTrigger className="bg-[#0d0d0d] border-[#1f1f1f] text-[#f5f5f5] h-9">
+                  <SelectTrigger className="glass border-white/5 text-xs h-10">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#141414] border-[#1f1f1f]">
-                    {ESITI_REPORT.map((e) => <SelectItem key={e} value={e}>{e}</SelectItem>)}
+                  <SelectContent className="glass-dark border-white/10">
+                    {ESITI_REPORT.map((e) => (
+                      <SelectItem key={e} value={e}>
+                        {e}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
 
-              <Button
-                variant="outline"
-                className="w-full border-[#1f1f1f] text-[#888] hover:text-[#f5f5f5] text-xs"
-                onClick={copyPublicLink}
-              >
-                <Copy size={14} className="mr-2" /> Copia link pubblico
-              </Button>
-
-              {report.leadId && (
+              <div className="flex flex-col gap-2 pt-2">
                 <Button
                   variant="outline"
-                  className="w-full border-[#1f1f1f] text-[#888] hover:text-[#f5f5f5] text-xs"
-                  onClick={() => router.push(`/pipeline/${report.leadId}`)}
+                  className="w-full border-white/10 text-[#f5f5f5] hover:bg-white/5 text-xs h-10 font-bold"
+                  onClick={copyPublicLink}
                 >
-                  <ExternalLink size={14} className="mr-2" /> Vai al lead
+                  <Copy size={14} className="mr-2" /> Link Pubblico
                 </Button>
-              )}
+
+                {report.leadId && (
+                  <Button
+                    variant="outline"
+                    className="w-full border-white/10 text-[#888] hover:text-[#f5f5f5] text-xs h-10 font-medium"
+                    onClick={() => router.push(`/pipeline/${report.leadId}`)}
+                  >
+                    <ExternalLink size={14} className="mr-2" /> Vai al Lead
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Report content */}
+        <div className="order-2 lg:order-1 lg:col-span-3">
+          <Card className="glass-dark border-white/5">
+            <CardContent className="p-4 md:p-8">
+              <div className="prose-report max-w-none">
+                <ReactMarkdown>
+                  {report.contenuto || "*Nessun contenuto disponibile*"}
+                </ReactMarkdown>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -215,12 +243,20 @@ function PublicReportView({ report }: { report: Report }) {
       <div className="border-b border-[#1f1f1f] bg-[#0d0d0d]">
         <div className="max-w-4xl mx-auto px-6 py-5 flex items-center justify-between">
           <div>
-            <span className="text-2xl font-bold tracking-widest text-[#c9a96e]">WIDE</span>
-            <span className="text-xs text-[#888] ml-1 tracking-wider">DIGITAL AGENCY</span>
+            <span className="text-2xl font-bold tracking-widest text-[#c9a96e]">
+              WIDE
+            </span>
+            <span className="text-xs text-[#888] ml-1 tracking-wider">
+              DIGITAL AGENCY
+            </span>
           </div>
           <div className="text-right">
-            <p className="text-xs text-[#888]">Analisi Digitale Riservata per</p>
-            <p className="text-sm font-semibold text-[#f5f5f5]">{report.azienda}</p>
+            <p className="text-xs text-[#888]">
+              Analisi Digitale Riservata per
+            </p>
+            <p className="text-sm font-semibold text-[#f5f5f5]">
+              {report.azienda}
+            </p>
           </div>
         </div>
       </div>
@@ -232,7 +268,9 @@ function PublicReportView({ report }: { report: Report }) {
           <p className="text-[#888] text-sm mt-1">
             Documento riservato · Generato il{" "}
             {new Date(report.createdTime).toLocaleDateString("it-IT", {
-              day: "2-digit", month: "long", year: "numeric",
+              day: "2-digit",
+              month: "long",
+              year: "numeric",
             })}
           </p>
         </div>
@@ -247,7 +285,8 @@ function PublicReportView({ report }: { report: Report }) {
             Vuoi trasformare questi dati in risultati concreti?
           </p>
           <p className="text-[#888] text-sm mb-6">
-            Scopri come migliorare la tua presenza digitale con una strategia su misura.
+            Scopri come migliorare la tua presenza digitale con una strategia su
+            misura.
           </p>
           <a
             href={calendlyUrl}
