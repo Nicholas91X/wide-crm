@@ -1,0 +1,103 @@
+export type Role = "admin" | "editor" | "viewer";
+
+export interface Lead {
+  id: string;
+  createdTime: string;
+  lastEdited: string;
+  nomeAzienda: string;
+  settore: string;
+  territorio: string;
+  sitoWeb: string;
+  profiloSocial: string;
+  canale: string;
+  note: string;
+  score: string; // "🔴 Basso" | "🟡 Medio" | "🟢 Alto"
+  stato: string;
+  dataPrimoContatto: string;
+  dataFollowUp: string;
+  risposta: string; // select: "In attesa" | "Positiva" | "Negativa" | "Silenzio"
+  urlReport: string;
+}
+
+export interface Report {
+  id: string;
+  createdTime: string;
+  titolo: string;
+  azienda: string;
+  settore: string;
+  leadId: string;
+  token: string;
+  stato: string;
+  esito: string;
+  dataGenerazione: string;
+  urlPagina: string;
+  contenuto: string;
+}
+
+export interface Client {
+  id: string;
+  createdTime: string;
+  nome: string;
+  settore: string;
+  valoreNetto: number;
+  dataInizio: string;
+  prossimoRinnovo: string;
+  statoContratto: string;
+  responsabile: string;
+}
+
+export const STATI_LEAD = [
+  "Da contattare",
+  "Contattato",
+  "Report in lavorazione",
+  "Report inviato",
+  "Follow-up",
+  "Acquisito",
+  "Non interessato",
+] as const;
+
+export const SCORE_OPTIONS = [
+  "🔴 Basso",
+  "🟡 Medio",
+  "🟢 Alto",
+] as const;
+
+export const RISPOSTA_OPTIONS = [
+  "In attesa",
+  "Positiva",
+  "Negativa",
+  "Silenzio",
+] as const;
+
+export const SETTORI = [
+  "Automotive",
+  "Ristorazione",
+  "Retail",
+  "Professionale",
+  "Immobiliare",
+  "Benessere",
+  "Altro",
+] as const;
+
+// Opzioni canale allineate al database Notion reale
+export const CANALI = [
+  "Di persona",
+  "LinkedIn",
+  "Email",
+  "Telefono",
+  "Social Media",
+  "Networking",
+] as const;
+
+export const STATI_REPORT = ["Bozza", "Pronto", "Inviato", "Visto", "Archiviato"] as const;
+
+export const ESITI_REPORT = [
+  "In attesa",
+  "Interesse manifestato",
+  "Call prenotata",
+  "Acquisito",
+  "Nessuna risposta",
+  "Rifiutato",
+] as const;
+
+export const STATI_CONTRATTO = ["Attivo", "In scadenza", "Sospeso", "Chiuso"] as const;
