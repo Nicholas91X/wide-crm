@@ -181,12 +181,13 @@ Usa la struttura e il formato markdown esatti indicati nel system prompt.`;
           .slice(0, 16);
 
         const report = await createReport({
-          titolo: `Analisi Digitale — ${companyName}`,
+          titolo: `${companyName} — Analisi Digitale`,
           azienda: companyName,
           settore: sector,
           leadId,
           contenuto: fullContent,
           token,
+          generatoDa: email,
         });
 
         await updateLead(leadId, {

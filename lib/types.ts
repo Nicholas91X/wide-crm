@@ -21,6 +21,7 @@ export interface Lead {
   dataFollowUp: string;
   risposta: string; // select: "In attesa" | "Positiva" | "Negativa" | "Silenzio"
   urlReport: string;
+  inseritoDA: string;
 }
 
 export interface Report {
@@ -36,6 +37,7 @@ export interface Report {
   dataGenerazione: string;
   urlPagina: string;
   contenuto: string;
+  generatoDa: string;
 }
 
 export interface Client {

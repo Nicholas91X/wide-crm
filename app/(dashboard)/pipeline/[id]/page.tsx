@@ -385,6 +385,13 @@ export default function LeadDetailPage() {
                 />
               </div>
 
+              {lead.inseritoDA && (
+                <div className="pt-1 flex items-center gap-2 text-xs text-[#444]">
+                  <span>Inserito da</span>
+                  <span className="text-[#666]">{lead.inseritoDA}</span>
+                </div>
+              )}
+
               {canEdit && (
                 <Button
                   onClick={saveChanges}

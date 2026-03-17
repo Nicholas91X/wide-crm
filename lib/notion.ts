@@ -62,6 +62,7 @@ function mapLead(page: any) {
     dataFollowUp: dateVal(page, "Data follow-up"),
     risposta: selectVal(page, "Risposta"),
     urlReport: urlVal(page, "URL Report"),
+    inseritoDA: richText(page, "Inserito da"),
   };
 }
 
@@ -85,6 +86,7 @@ function mapReport(page: any) {
     esito: selectVal(page, "Esito"),
     dataGenerazione: dateVal(page, "Data generazione"),
     urlPagina: urlVal(page, "URL Pagina Report"),
+    generatoDa: richText(page, "Generato da"),
     contenuto: "", // populated separately via fetchReportContent()
   };
 }
@@ -203,6 +205,7 @@ export async function createLead(data: {
   profiloSocial3?: string;
   canale?: string;
   note?: string;
+  inseritoDA?: string;
 }) {
   const page = await notion.pages.create({
     parent: { database_id: PIPELINE_DB },
@@ -216,6 +219,7 @@ export async function createLead(data: {
       ...(data.profiloSocial3 && { "Profilo Social 3": { url: data.profiloSocial3 } }),
       ...(data.canale && { "Canale primo contatto": { select: { name: data.canale } } }),
       ...(data.note && { Note: { rich_text: [{ text: { content: data.note } }] } }),
+      ...(data.inseritoDA && { "Inserito da": { rich_text: [{ text: { content: data.inseritoDA } }] } }),
       Stato: { select: { name: "Da contattare" } },
     },
   });
@@ -342,6 +346,7 @@ export async function createReport(data: {
   contenuto: string;
   token: string;
   urlPagina?: string;
+  generatoDa?: string;
 }) {
   const page = await notion.pages.create({
     parent: { database_id: REPORTS_DB },
@@ -355,6 +360,7 @@ export async function createReport(data: {
       Esito: { select: { name: "In attesa" } },
       "Data generazione": { date: { start: new Date().toISOString().split("T")[0] } },
       ...(data.urlPagina && { "URL Pagina Report": { url: data.urlPagina } }),
+      ...(data.generatoDa && { "Generato da": { rich_text: [{ text: { content: data.generatoDa } }] } }),
     },
     // Store content as page body blocks
     children: contentToBlocks(data.contenuto),

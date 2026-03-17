@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const data = await req.json();
-    const lead = await createLead(data);
+    const lead = await createLead({ ...data, inseritoDA: session.user?.email ?? "" });
     return NextResponse.json(lead, { status: 201 });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });

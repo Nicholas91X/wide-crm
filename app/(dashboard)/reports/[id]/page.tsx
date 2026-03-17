@@ -210,6 +210,13 @@ export default function ReportDetailPage() {
                 </Select>
               </div>
 
+              {report.generatoDa && (
+                <div className="pt-1 flex items-center justify-between text-xs">
+                  <span className="text-[#555] uppercase tracking-wider font-bold text-[10px]">Generato da</span>
+                  <span className="text-[#888]">{report.generatoDa}</span>
+                </div>
+              )}
+
               <div className="flex flex-col gap-2 pt-2">
                 <Button
                   variant="outline"
