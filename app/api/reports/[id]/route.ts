@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { getReport, updateReport } from "@/lib/notion";
+import { getReport, updateReport, deleteReport } from "@/lib/notion";
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   // Public access with token
@@ -36,6 +36,23 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     const data = await req.json();
     const report = await updateReport(params.id, data);
     return NextResponse.json(report);
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+  const session = await getServerSession(authOptions);
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const role = (session.user as any)?.role;
+  if (role !== "admin" && role !== "editor") {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  try {
+    await deleteReport(params.id);
+    return NextResponse.json({ success: true });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }

@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { leadId, companyName, sector, territory, sitoWeb, profiloSocial, note, additionalInfo } =
+  const { leadId, companyName, sector, territory, sitoWeb, profiloSocial, profiloSocial2, profiloSocial3, note, additionalInfo } =
     await req.json();
 
   if (!leadId || !companyName) {
@@ -133,7 +133,9 @@ DATI AZIENDA:
 - Settore: ${sector || "Non specificato"}
 - Territorio: ${territory || "Non specificato"}
 ${sitoWeb ? `- Sito web: ${sitoWeb}` : "- Sito web: non fornito"}
-${profiloSocial ? `- Profilo social principale: ${profiloSocial}` : ""}
+${profiloSocial ? `- Profilo social 1: ${profiloSocial}` : ""}
+${profiloSocial2 ? `- Profilo social 2: ${profiloSocial2}` : ""}
+${profiloSocial3 ? `- Profilo social 3: ${profiloSocial3}` : ""}
 ${note ? `- Note interne: ${note}` : ""}
 ${additionalInfo ? `- Informazioni aggiuntive: ${additionalInfo}` : ""}
 
@@ -190,6 +192,7 @@ Usa la struttura e il formato markdown esatti indicati nel system prompt.`;
         await updateLead(leadId, {
           stato: "Report completato",
           urlReport: `/r/${report.id}`,
+          dataCreazioneReport: new Date().toISOString().split("T")[0],
         }).catch(() => {});
 
         // Send report ID to client

@@ -136,6 +136,8 @@ export default function LeadDetailPage() {
           territory: lead.territorio,
           sitoWeb: lead.sitoWeb,
           profiloSocial: lead.profiloSocial,
+          profiloSocial2: lead.profiloSocial2,
+          profiloSocial3: lead.profiloSocial3,
           note: lead.note,
           additionalInfo,
         }),
@@ -312,14 +314,38 @@ export default function LeadDetailPage() {
                 </div>
                 <div className="space-y-1">
                   <Label className="text-[10px] uppercase text-[#555] font-bold tracking-tight">
-                    Profilo Social
+                    Profilo Social 1
                   </Label>
                   <Input
                     value={form.profiloSocial ?? ""}
                     onChange={(e) => setField("profiloSocial", e.target.value)}
                     disabled={!canEdit}
                     className="glass border-white/5 text-sm h-10"
-                    placeholder="https://..."
+                    placeholder="https://instagram.com/..."
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-[10px] uppercase text-[#555] font-bold tracking-tight">
+                    Profilo Social 2
+                  </Label>
+                  <Input
+                    value={form.profiloSocial2 ?? ""}
+                    onChange={(e) => setField("profiloSocial2", e.target.value)}
+                    disabled={!canEdit}
+                    className="glass border-white/5 text-sm h-10"
+                    placeholder="https://facebook.com/..."
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-[10px] uppercase text-[#555] font-bold tracking-tight">
+                    Profilo Social 3
+                  </Label>
+                  <Input
+                    value={form.profiloSocial3 ?? ""}
+                    onChange={(e) => setField("profiloSocial3", e.target.value)}
+                    disabled={!canEdit}
+                    className="glass border-white/5 text-sm h-10"
+                    placeholder="https://linkedin.com/..."
                   />
                 </div>
               </div>
@@ -438,7 +464,33 @@ export default function LeadDetailPage() {
 
               <div className="space-y-1">
                 <Label className="text-[10px] uppercase text-[#555] font-bold tracking-tight">
-                  Prossimo Contatto
+                  Data primo contatto
+                </Label>
+                <Input
+                  type="date"
+                  value={form.dataPrimoContatto ?? ""}
+                  onChange={(e) => setField("dataPrimoContatto", e.target.value)}
+                  disabled={!canEdit}
+                  className="glass border-white/5 text-sm h-10"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <Label className="text-[10px] uppercase text-[#555] font-bold tracking-tight">
+                  Data secondo contatto
+                </Label>
+                <Input
+                  type="date"
+                  value={form.dataSecondoContatto ?? ""}
+                  onChange={(e) => setField("dataSecondoContatto", e.target.value)}
+                  disabled={!canEdit}
+                  className="glass border-white/5 text-sm h-10"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <Label className="text-[10px] uppercase text-[#555] font-bold tracking-tight">
+                  Follow-up
                 </Label>
                 <Input
                   type="date"
@@ -458,14 +510,25 @@ export default function LeadDetailPage() {
                   >
                     <FileText size={16} className="mr-2" /> Genera Report AI
                   </Button>
+                  {lead.urlReport && (
+                    <Button
+                      variant="outline"
+                      className="w-full border-[#1f1f1f] text-[#888] hover:text-[#f5f5f5] h-10 font-bold text-xs"
+                      onClick={() => {
+                        const reportId = lead.urlReport.replace("/r/", "");
+                        router.push(`/reports/${reportId}`);
+                      }}
+                    >
+                      <ExternalLink size={16} className="mr-2" /> Vai al Report
+                    </Button>
+                  )}
                   <Button
                     variant="outline"
                     className="w-full border-green-900/40 text-green-400 hover:bg-green-900/20 h-10 font-bold text-xs"
                     onClick={markAcquired}
                     disabled={saving}
                   >
-                    <CheckCircle size={16} className="mr-2" /> Converti in
-                    Cliente
+                    <CheckCircle size={16} className="mr-2" /> Converti in Cliente
                   </Button>
                 </div>
               )}

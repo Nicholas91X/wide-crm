@@ -9,11 +9,15 @@ export interface Lead {
   territorio: string;
   sitoWeb: string;
   profiloSocial: string;
+  profiloSocial2: string;
+  profiloSocial3: string;
   canale: string;
   note: string;
   score: string; // "🔴 Basso" | "🟡 Medio" | "🟢 Alto"
   stato: string;
+  dataCreazioneReport: string;
   dataPrimoContatto: string;
+  dataSecondoContatto: string;
   dataFollowUp: string;
   risposta: string; // select: "In attesa" | "Positiva" | "Negativa" | "Silenzio"
   urlReport: string;

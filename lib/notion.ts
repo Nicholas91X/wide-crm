@@ -50,13 +50,17 @@ function mapLead(page: any) {
     territorio: richText(page, "Territorio"),
     sitoWeb: urlVal(page, "Sito Web"),
     profiloSocial: urlVal(page, "Profilo Social"),
+    profiloSocial2: urlVal(page, "Profilo Social 2"),
+    profiloSocial3: urlVal(page, "Profilo Social 3"),
     canale: selectVal(page, "Canale primo contatto"),
     note: richText(page, "Note"),
-    score: selectVal(page, "Score Qualificazione"), // "🔴 Basso" | "🟡 Medio" | "🟢 Alto"
+    score: selectVal(page, "Score Qualificazione"),
     stato: selectVal(page, "Stato"),
+    dataCreazioneReport: dateVal(page, "Data creazione report"),
     dataPrimoContatto: dateVal(page, "Data primo contatto"),
+    dataSecondoContatto: dateVal(page, "Data secondo contatto"),
     dataFollowUp: dateVal(page, "Data follow-up"),
-    risposta: selectVal(page, "Risposta"), // select: In attesa / Positiva / Negativa / Silenzio
+    risposta: selectVal(page, "Risposta"),
     urlReport: urlVal(page, "URL Report"),
   };
 }
@@ -195,6 +199,8 @@ export async function createLead(data: {
   territorio: string;
   sitoWeb?: string;
   profiloSocial?: string;
+  profiloSocial2?: string;
+  profiloSocial3?: string;
   canale?: string;
   note?: string;
 }) {
@@ -206,10 +212,11 @@ export async function createLead(data: {
       ...(data.territorio && { Territorio: { rich_text: [{ text: { content: data.territorio } }] } }),
       ...(data.sitoWeb && { "Sito Web": { url: data.sitoWeb } }),
       ...(data.profiloSocial && { "Profilo Social": { url: data.profiloSocial } }),
+      ...(data.profiloSocial2 && { "Profilo Social 2": { url: data.profiloSocial2 } }),
+      ...(data.profiloSocial3 && { "Profilo Social 3": { url: data.profiloSocial3 } }),
       ...(data.canale && { "Canale primo contatto": { select: { name: data.canale } } }),
       ...(data.note && { Note: { rich_text: [{ text: { content: data.note } }] } }),
       Stato: { select: { name: "Da contattare" } },
-      "Data primo contatto": { date: { start: new Date().toISOString().split("T")[0] } },
     },
   });
   return mapLead(page);
@@ -223,10 +230,15 @@ export async function updateLead(
     territorio: string;
     sitoWeb: string;
     profiloSocial: string;
+    profiloSocial2: string;
+    profiloSocial3: string;
     canale: string;
     note: string;
-    score: string; // "🔴 Basso" | "🟡 Medio" | "🟢 Alto"
+    score: string;
     stato: string;
+    dataCreazioneReport: string;
+    dataPrimoContatto: string;
+    dataSecondoContatto: string;
     dataFollowUp: string;
     risposta: string;
     urlReport: string;
@@ -243,6 +255,10 @@ export async function updateLead(
     props["Sito Web"] = { url: data.sitoWeb || null };
   if (data.profiloSocial !== undefined)
     props["Profilo Social"] = { url: data.profiloSocial || null };
+  if (data.profiloSocial2 !== undefined)
+    props["Profilo Social 2"] = { url: data.profiloSocial2 || null };
+  if (data.profiloSocial3 !== undefined)
+    props["Profilo Social 3"] = { url: data.profiloSocial3 || null };
   if (data.canale !== undefined)
     props["Canale primo contatto"] = { select: { name: data.canale } };
   if (data.note !== undefined)
@@ -251,6 +267,12 @@ export async function updateLead(
     props["Score Qualificazione"] = data.score ? { select: { name: data.score } } : { select: null };
   if (data.stato !== undefined)
     props["Stato"] = { select: { name: data.stato } };
+  if (data.dataCreazioneReport !== undefined)
+    props["Data creazione report"] = data.dataCreazioneReport ? { date: { start: data.dataCreazioneReport } } : { date: null };
+  if (data.dataPrimoContatto !== undefined)
+    props["Data primo contatto"] = data.dataPrimoContatto ? { date: { start: data.dataPrimoContatto } } : { date: null };
+  if (data.dataSecondoContatto !== undefined)
+    props["Data secondo contatto"] = data.dataSecondoContatto ? { date: { start: data.dataSecondoContatto } } : { date: null };
   if (data.dataFollowUp !== undefined)
     props["Data follow-up"] = data.dataFollowUp ? { date: { start: data.dataFollowUp } } : { date: null };
   if (data.risposta !== undefined)
@@ -341,6 +363,10 @@ export async function createReport(data: {
   const report = mapReport(page);
   report.contenuto = data.contenuto;
   return report;
+}
+
+export async function deleteReport(id: string) {
+  await notion.pages.update({ page_id: id, archived: true });
 }
 
 export async function updateReport(

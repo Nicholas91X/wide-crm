@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Copy, ArrowLeft, ExternalLink } from "lucide-react";
+import { Copy, ArrowLeft, ExternalLink, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Report, STATI_REPORT, ESITI_REPORT } from "@/lib/types";
 
@@ -86,6 +86,22 @@ export default function ReportDetailPage() {
     const url = `${window.location.origin}/r/${id}?token=${report.token}`;
     navigator.clipboard.writeText(url);
     toast.success("Link copiato negli appunti");
+  }
+
+  function openPublicLink() {
+    if (!report) return;
+    window.open(`${window.location.origin}/r/${id}?token=${report.token}`, "_blank");
+  }
+
+  async function handleDelete() {
+    if (!confirm("Eliminare definitivamente questo report?")) return;
+    try {
+      await fetch(`/api/reports/${id}`, { method: "DELETE" });
+      toast.success("Report eliminato");
+      router.push("/reports");
+    } catch {
+      toast.error("Errore nell'eliminazione");
+    }
   }
 
   if (loading) {
@@ -200,7 +216,15 @@ export default function ReportDetailPage() {
                   className="w-full border-white/10 text-[#f5f5f5] hover:bg-white/5 text-xs h-10 font-bold"
                   onClick={copyPublicLink}
                 >
-                  <Copy size={14} className="mr-2" /> Link Pubblico
+                  <Copy size={14} className="mr-2" /> Copia link pubblico
+                </Button>
+
+                <Button
+                  variant="outline"
+                  className="w-full border-[#c9a96e]/20 text-[#c9a96e] hover:bg-[#c9a96e]/10 text-xs h-10 font-bold"
+                  onClick={openPublicLink}
+                >
+                  <ExternalLink size={14} className="mr-2" /> Apri link pubblico
                 </Button>
 
                 {report.leadId && (
@@ -212,6 +236,14 @@ export default function ReportDetailPage() {
                     <ExternalLink size={14} className="mr-2" /> Vai al Lead
                   </Button>
                 )}
+
+                <Button
+                  variant="outline"
+                  className="w-full border-red-900/30 text-red-400 hover:bg-red-900/20 text-xs h-10 font-medium mt-2"
+                  onClick={handleDelete}
+                >
+                  <Trash2 size={14} className="mr-2" /> Elimina report
+                </Button>
               </div>
             </CardContent>
           </Card>
