@@ -20,6 +20,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { FollowupBadge } from "@/components/FollowupBadge";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -64,7 +65,10 @@ export default function Sidebar() {
                     : "text-[#888] hover:text-[#f5f5f5] hover:bg-[#141414]",
                 )}
               >
-                <Icon size={18} />
+                <span className="relative">
+                  <Icon size={18} />
+                  {href === "/pipeline" && <FollowupBadge />}
+                </span>
                 {label}
                 {(active || subActive) && <ChevronRight size={14} className="ml-auto" />}
               </Link>

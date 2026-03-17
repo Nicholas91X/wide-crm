@@ -569,3 +569,18 @@ export async function getAuditLogs(limit = 100) {
   });
   return response.results.map(mapAuditLog);
 }
+
+export async function getLeadsWithFollowupDue() {
+  const today = new Date().toISOString().split("T")[0];
+  try {
+    const response = await notion.databases.query({
+      database_id: PIPELINE_DB,
+      filter: { property: "Data follow-up", date: { on_or_before: today } },
+    });
+    return response.results
+      .map(mapLead)
+      .filter(l => l.stato !== "Acquisito" && l.stato !== "Non interessato");
+  } catch {
+    return [];
+  }
+}

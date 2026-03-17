@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Plus, MoreHorizontal, List, Columns, Filter, Sparkles } from "lucide-react";
+import { Plus, MoreHorizontal, List, Columns, Filter, Sparkles, GripVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,6 +24,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Lead, STATI_LEAD, SETTORI, SCORE_OPTIONS } from "@/lib/types";
+import {
+  DndContext,
+  DragEndEvent,
+  useDraggable,
+  useDroppable,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import { CSS } from "@dnd-kit/utilities";
 
 function StatoBadge({ stato }: { stato: string }) {
   const colors: Record<string, string> = {
@@ -130,6 +140,23 @@ export default function PipelinePage() {
       loadLeads();
     } catch {
       toast.error("Errore nell'archiviazione");
+    }
+  }
+
+  async function moveCard(leadId: string, newStato: string) {
+    const original = leads.find((l) => l.id === leadId)?.stato;
+    setLeads((prev) => prev.map((l) => l.id === leadId ? { ...l, stato: newStato } : l));
+    try {
+      const res = await fetch(`/api/leads/${leadId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ stato: newStato }),
+      });
+      if (!res.ok) throw new Error();
+      toast.success(`Spostato in "${newStato}"`);
+    } catch {
+      if (original) setLeads((prev) => prev.map((l) => l.id === leadId ? { ...l, stato: original } : l));
+      toast.error("Errore nello spostamento");
     }
   }
 
@@ -285,7 +312,7 @@ export default function PipelinePage() {
           onArchive={archiveLead}
         />
       ) : (
-        <KanbanView leads={leads} />
+        <KanbanView leads={leads} onMoveCard={canEdit ? moveCard : undefined} />
       )}
     </div>
   );
@@ -499,50 +526,131 @@ function TableView({
   );
 }
 
-function KanbanView({ leads }: { leads: Lead[] }) {
+function KanbanView({
+  leads,
+  onMoveCard,
+}: {
+  leads: Lead[];
+  onMoveCard?: (id: string, newStato: string) => void;
+}) {
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
+  );
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || !onMoveCard) return;
+    const leadId = active.id as string;
+    const newStato = over.id as string;
+    const current = leads.find((l) => l.id === leadId)?.stato;
+    if (!current || current === newStato) return;
+    onMoveCard(leadId, newStato);
+  }
+
   return (
-    <div className="overflow-x-auto pb-4">
-      <div className="flex gap-4 min-w-max">
-        {KANBAN_COLS.map((col) => {
-          const colLeads = leads.filter((l) => l.stato === col);
-          return (
-            <div key={col} className="w-60 flex-shrink-0">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-xs font-semibold text-[#888] uppercase tracking-wider">
-                  {col}
-                </h3>
-                <span className="text-xs bg-[#1f1f1f] text-[#888] rounded-full px-2 py-0.5">
-                  {colLeads.length}
-                </span>
-              </div>
-              <div className="space-y-2">
-                {colLeads.map((lead) => (
-                  <Link key={lead.id} href={`/pipeline/${lead.id}`}>
-                    <div className="bg-[#141414] border border-[#1f1f1f] rounded-lg p-3 hover:border-[#c9a96e]/40 transition-colors cursor-pointer">
-                      <p className="text-sm font-medium text-[#f5f5f5] truncate">
-                        {lead.nomeAzienda}
-                      </p>
-                      <p className="text-xs text-[#888] mt-1">
-                        {lead.settore} · {lead.territorio}
-                      </p>
-                      {lead.score && (
-                        <p className="text-xs text-[#c9a96e] mt-2 font-semibold">
-                          {lead.score}
-                        </p>
-                      )}
-                    </div>
-                  </Link>
-                ))}
-                {colLeads.length === 0 && (
-                  <div className="border border-dashed border-[#1f1f1f] rounded-lg p-4 text-center text-xs text-[#555]">
-                    Vuoto
-                  </div>
-                )}
-              </div>
-            </div>
-          );
-        })}
+    <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+      <div className="overflow-x-auto pb-6">
+        <div className="flex gap-3 min-w-max">
+          {KANBAN_COLS.map((col) => (
+            <KanbanColumn key={col} col={col} leads={leads.filter((l) => l.stato === col)} canDrag={!!onMoveCard} />
+          ))}
+        </div>
       </div>
+    </DndContext>
+  );
+}
+
+const KANBAN_COL_ACCENT: Record<string, string> = {
+  "Da contattare": "border-gray-700",
+  Contattato: "border-blue-800/50",
+  "Report in lavorazione": "border-yellow-800/50",
+  "Report completato": "border-cyan-800/50",
+  "Report inviato": "border-purple-800/50",
+  "Follow-up": "border-orange-800/50",
+  Acquisito: "border-green-800/50",
+  "Non interessato": "border-red-900/50",
+};
+
+function KanbanColumn({ col, leads, canDrag }: { col: string; leads: Lead[]; canDrag: boolean }) {
+  const { isOver, setNodeRef } = useDroppable({ id: col });
+
+  return (
+    <div className="w-56 flex-shrink-0 flex flex-col">
+      <div className="flex items-center justify-between mb-2 px-1">
+        <h3 className="text-[10px] font-bold text-[#555] uppercase tracking-wider truncate pr-2">{col}</h3>
+        <span className="text-[10px] bg-[#1a1a1a] text-[#555] rounded-full px-2 py-0.5 flex-shrink-0">{leads.length}</span>
+      </div>
+      <div
+        ref={setNodeRef}
+        className={cn(
+          "flex-1 space-y-2 min-h-[120px] rounded-xl p-2 transition-colors border",
+          isOver ? "bg-[#c9a96e]/5 border-[#c9a96e]/20" : "bg-[#0d0d0d] border-white/5"
+        )}
+      >
+        {leads.map((lead) => (
+          <KanbanCard key={lead.id} lead={lead} canDrag={canDrag} />
+        ))}
+        {leads.length === 0 && (
+          <div className="flex items-center justify-center h-16 border border-dashed border-white/5 rounded-lg">
+            <span className="text-[10px] text-[#333]">Vuoto</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function KanbanCard({ lead, canDrag }: { lead: Lead; canDrag: boolean }) {
+  const router = useRouter();
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: lead.id,
+    data: { stato: lead.stato },
+    disabled: !canDrag,
+  });
+
+  const style = transform
+    ? { transform: CSS.Translate.toString(transform), zIndex: 50 }
+    : undefined;
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={cn(
+        "bg-[#141414] border border-[#1f1f1f] rounded-lg p-3 group hover:border-[#c9a96e]/30 transition-colors relative",
+        isDragging && "opacity-40 shadow-2xl"
+      )}
+    >
+      {canDrag && (
+        <button
+          {...listeners}
+          {...attributes}
+          className="absolute top-2 right-2 text-[#333] hover:text-[#555] cursor-grab active:cursor-grabbing touch-none"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <GripVertical size={12} />
+        </button>
+      )}
+      <button
+        className="text-left w-full pr-4"
+        onClick={() => router.push(`/pipeline/${lead.id}`)}
+      >
+        <p className="text-xs font-semibold text-[#f5f5f5] truncate leading-tight">{lead.nomeAzienda}</p>
+        {lead.settore && (
+          <p className="text-[10px] text-[#555] mt-0.5 truncate">{lead.settore}</p>
+        )}
+        {lead.territorio && (
+          <p className="text-[10px] text-[#444] truncate">{lead.territorio}</p>
+        )}
+        <div className="flex items-center justify-between mt-2">
+          {lead.score ? (
+            <span className="text-[10px] text-[#c9a96e] font-bold">{lead.score}</span>
+          ) : <span />}
+          {lead.dataFollowUp && (
+            <span className="text-[9px] text-[#444]">{formatDate(lead.dataFollowUp)}</span>
+          )}
+        </div>
+      </button>
     </div>
   );
 }

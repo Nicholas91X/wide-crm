@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSession } from "next-auth/react";
+import { FollowupBadge } from "@/components/FollowupBadge";
 
 const navItems = [
   { href: "/dashboard", label: "Home", icon: LayoutDashboard },
@@ -40,7 +41,10 @@ export default function BottomNav() {
                 active ? "text-[#c9a96e]" : "text-[#888]",
               )}
             >
-              <Icon size={20} className={cn(active && "scale-110")} />
+              <span className="relative">
+                <Icon size={20} className={cn(active && "scale-110")} />
+                {href === "/pipeline" && <FollowupBadge />}
+              </span>
               <span className="text-[10px] font-medium">{label}</span>
             </Link>
           );
