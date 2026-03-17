@@ -232,7 +232,7 @@ export default function DiscoverPage() {
   const addedCount = leads.filter((l) => l.addStatus === "created").length;
 
   return (
-    <div className="max-w-4xl mx-auto px-1 md:px-0 space-y-6 pb-28">
+    <div className="max-w-4xl mx-auto px-1 md:px-0 space-y-6 pb-40 md:pb-28">
 
       {/* Header */}
       <div className="flex items-center gap-3">
@@ -567,7 +567,7 @@ export default function DiscoverPage() {
 
       {/* Sticky action bar */}
       {status === "done" && selectedCount > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 z-30 bg-[#0a0a0a]/95 backdrop-blur-xl border-t border-white/5">
+        <div className="fixed bottom-16 md:bottom-0 left-0 right-0 z-30 bg-[#0a0a0a]/95 backdrop-blur-xl border-t border-white/5">
           <div className="max-w-4xl mx-auto px-5 py-4 flex items-center justify-between gap-4">
             <div>
               <p className="text-sm text-[#888]">
