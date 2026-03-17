@@ -15,8 +15,8 @@ import { useSession } from "next-auth/react";
 
 const navItems = [
   { href: "/dashboard", label: "Home", icon: LayoutDashboard },
-  { href: "/pipeline", label: "Pipeline", icon: GitBranch },
   { href: "/leads", label: "Leads", icon: Sparkles },
+  { href: "/pipeline", label: "Pipeline", icon: GitBranch },
   { href: "/reports", label: "Report", icon: FileText },
   { href: "/clients", label: "Clienti", icon: Users },
 ];
