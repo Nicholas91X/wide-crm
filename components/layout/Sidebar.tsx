@@ -14,6 +14,7 @@ import {
   Menu,
   X,
   ChevronRight,
+  Sparkles,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -21,7 +22,9 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/pipeline", label: "Pipeline", icon: GitBranch },
+  { href: "/pipeline", label: "Pipeline", icon: GitBranch, sub: [
+    { href: "/pipeline/discover", label: "Scopri Lead", icon: Sparkles },
+  ]},
   { href: "/reports", label: "Report", icon: FileText },
   { href: "/clients", label: "Clienti", icon: Users },
 ];
@@ -44,24 +47,49 @@ export default function Sidebar() {
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 space-y-1">
-        {navItems.map(({ href, label, icon: Icon }) => {
-          const active = pathname.startsWith(href);
+        {navItems.map(({ href, label, icon: Icon, sub }: any) => {
+          const active = pathname === href || (href !== "/pipeline" && pathname.startsWith(href)) || (href === "/pipeline" && pathname === "/pipeline");
+          const subActive = sub?.some((s: any) => pathname.startsWith(s.href));
           return (
-            <Link
-              key={href}
-              href={href}
-              onClick={() => setMobileOpen(false)}
-              className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors",
-                active
-                  ? "bg-[#c9a96e]/10 text-[#c9a96e]"
-                  : "text-[#888] hover:text-[#f5f5f5] hover:bg-[#141414]",
+            <div key={href}>
+              <Link
+                href={href}
+                onClick={() => setMobileOpen(false)}
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors",
+                  active || subActive
+                    ? "bg-[#c9a96e]/10 text-[#c9a96e]"
+                    : "text-[#888] hover:text-[#f5f5f5] hover:bg-[#141414]",
+                )}
+              >
+                <Icon size={18} />
+                {label}
+                {(active || subActive) && <ChevronRight size={14} className="ml-auto" />}
+              </Link>
+              {sub && (active || subActive) && (
+                <div className="ml-8 mt-0.5 space-y-0.5">
+                  {sub.map((s: any) => {
+                    const subIsActive = pathname.startsWith(s.href);
+                    return (
+                      <Link
+                        key={s.href}
+                        href={s.href}
+                        onClick={() => setMobileOpen(false)}
+                        className={cn(
+                          "flex items-center gap-2 px-3 py-2 rounded-md text-xs font-medium transition-colors",
+                          subIsActive
+                            ? "text-[#c9a96e] bg-[#c9a96e]/5"
+                            : "text-[#666] hover:text-[#f5f5f5] hover:bg-[#141414]",
+                        )}
+                      >
+                        <s.icon size={13} />
+                        {s.label}
+                      </Link>
+                    );
+                  })}
+                </div>
               )}
-            >
-              <Icon size={18} />
-              {label}
-              {active && <ChevronRight size={14} className="ml-auto" />}
-            </Link>
+            </div>
           );
         })}
 

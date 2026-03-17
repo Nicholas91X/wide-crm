@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Plus, MoreHorizontal, List, Columns, Filter } from "lucide-react";
+import { Plus, MoreHorizontal, List, Columns, Filter, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
@@ -177,13 +177,23 @@ export default function PipelinePage() {
             </Button>
           </div>
           {canEdit && (
-            <Button
-              size="sm"
-              onClick={() => router.push("/pipeline/new")}
-              className="bg-[#c9a96e] hover:bg-[#b8945a] text-[#0a0a0a] font-bold h-8"
-            >
-              <Plus size={16} className="mr-1" /> Nuovo
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => router.push("/pipeline/discover")}
+                className="border-[#c9a96e]/20 text-[#c9a96e] hover:bg-[#c9a96e]/10 font-bold h-8 text-xs"
+              >
+                <Sparkles size={14} className="mr-1" /> Scopri
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => router.push("/pipeline/new")}
+                className="bg-[#c9a96e] hover:bg-[#b8945a] text-[#0a0a0a] font-bold h-8"
+              >
+                <Plus size={16} className="mr-1" /> Nuovo
+              </Button>
+            </div>
           )}
         </div>
       </div>
