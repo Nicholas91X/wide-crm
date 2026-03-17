@@ -182,14 +182,16 @@ export default function DiscoverPage() {
 
       const { results } = await res.json();
 
+      // Build updated array outside setLeads to avoid React re-running the updater
+      // with a stale closure index
       let resultIndex = 0;
-      setLeads((prev) =>
-        prev.map((l, i) => {
-          if (!selected.has(i)) return l;
-          const result = results[resultIndex++];
-          return { ...l, addStatus: result.status, addReason: result.reason };
-        })
-      );
+      const updatedLeads = leads.map((l, i) => {
+        if (!selected.has(i)) return l;
+        const result = results[resultIndex++];
+        if (!result) return l;
+        return { ...l, addStatus: result.status as "created" | "duplicate" | "error", addReason: result.reason };
+      });
+      setLeads(updatedLeads);
 
       const created = results.filter((r: any) => r.status === "created").length;
       const duplicates = results.filter((r: any) => r.status === "duplicate").length;
