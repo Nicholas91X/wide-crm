@@ -5,6 +5,7 @@ const notion = new Client({ auth: process.env.NOTION_TOKEN });
 const PIPELINE_DB = process.env.NOTION_PIPELINE_DB_ID!;
 const REPORTS_DB = process.env.NOTION_REPORTS_DB_ID!;
 const CLIENTS_DB = process.env.NOTION_CLIENTS_DB_ID!;
+const SEARCHES_DB = process.env.NOTION_SEARCHES_DB_ID!;
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -369,6 +370,93 @@ export async function createReport(data: {
   const report = mapReport(page);
   report.contenuto = data.contenuto;
   return report;
+}
+
+// ─── Search Logs ──────────────────────────────────────────────────────────────
+
+function mapSearchLog(page: any) {
+  return {
+    id: page.id,
+    createdTime: page.created_time,
+    titolo: richText(page, "Titolo"),
+    settore: selectVal(page, "Settore"),
+    territorio: richText(page, "Territorio"),
+    tipoAttivita: richText(page, "Tipo Attività"),
+    criteriAggiuntivi: richText(page, "Criteri Aggiuntivi"),
+    numRichiesti: numberVal(page, "Num Richiesti"),
+    numTrovati: numberVal(page, "Num Trovati"),
+    numAggiunti: numberVal(page, "Num Aggiunti"),
+    effettuataDa: richText(page, "Effettuata Da"),
+    dataRicerca: dateVal(page, "Data Ricerca"),
+    metodo: selectVal(page, "Metodo"),
+    leads: [] as any[],
+  };
+}
+
+export async function getSearchLogs() {
+  const response = await notion.databases.query({
+    database_id: SEARCHES_DB,
+    sorts: [{ timestamp: "created_time", direction: "descending" }],
+    page_size: 50,
+  });
+  return response.results.map(mapSearchLog);
+}
+
+export async function getSearchLog(id: string) {
+  const [page, blocks] = await Promise.all([
+    notion.pages.retrieve({ page_id: id }),
+    notion.blocks.children.list({ block_id: id, page_size: 1 }),
+  ]);
+  const log = mapSearchLog(page);
+  // Leads stored as first paragraph block (JSON)
+  const firstBlock = (blocks.results as any[])[0];
+  if (firstBlock?.type === "paragraph") {
+    const text = firstBlock.paragraph.rich_text?.[0]?.plain_text ?? "";
+    try { log.leads = JSON.parse(text); } catch {}
+  }
+  return log;
+}
+
+export async function createSearchLog(data: {
+  titolo: string;
+  settore?: string;
+  territorio: string;
+  tipoAttivita?: string;
+  criteriAggiuntivi?: string;
+  numRichiesti: number;
+  numTrovati: number;
+  numAggiunti: number;
+  effettuataDa: string;
+  metodo: string;
+  leads: any[];
+}) {
+  const leadsJson = JSON.stringify(data.leads);
+  // Split JSON into ≤2000 char chunks for Notion blocks
+  const chunks = leadsJson.match(/.{1,2000}/gs) ?? [leadsJson];
+
+  const page = await notion.pages.create({
+    parent: { database_id: SEARCHES_DB },
+    properties: {
+      Titolo: { title: [{ text: { content: data.titolo } }] },
+      ...(data.settore && { Settore: { select: { name: data.settore } } }),
+      Territorio: { rich_text: [{ text: { content: data.territorio } }] },
+      ...(data.tipoAttivita && { "Tipo Attività": { rich_text: [{ text: { content: data.tipoAttivita } }] } }),
+      ...(data.criteriAggiuntivi && { "Criteri Aggiuntivi": { rich_text: [{ text: { content: data.criteriAggiuntivi } }] } }),
+      "Num Richiesti": { number: data.numRichiesti },
+      "Num Trovati": { number: data.numTrovati },
+      "Num Aggiunti": { number: data.numAggiunti },
+      "Effettuata Da": { rich_text: [{ text: { content: data.effettuataDa } }] },
+      "Data Ricerca": { date: { start: new Date().toISOString().split("T")[0] } },
+      ...(data.metodo && { Metodo: { select: { name: data.metodo } } }),
+    },
+    children: chunks.map((chunk) => ({
+      object: "block",
+      type: "paragraph",
+      paragraph: { rich_text: [{ type: "text", text: { content: chunk } }] },
+    })),
+  });
+
+  return mapSearchLog(page);
 }
 
 export async function deleteReport(id: string) {

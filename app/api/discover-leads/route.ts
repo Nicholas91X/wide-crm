@@ -145,6 +145,7 @@ Outputta esattamente ${count} righe __LEAD__:... Nient'altro.`;
 
         // ── TIER 1: Tavily ──────────────────────────────────────────────────
         if (process.env.TAVILY_API_KEY) {
+          send("__METHOD__:Tavily\n");
           send("Ricerca Tavily in corso...\n");
           try {
             const queries = buildTavilyQueries(settore, territorio, tipoAttivita);
@@ -189,6 +190,7 @@ ${userPromptBase}`;
         }
 
         // ── TIER 2: Anthropic web_search ────────────────────────────────────
+        send("__METHOD__:Web Search\n");
         send("Ricerca con web search...\n");
         try {
           // Non-streaming: collect full response to detect if tool actually produced leads
@@ -222,6 +224,7 @@ ${userPromptBase}`;
         }
 
         // ── TIER 3: Knowledge-only ───────────────────────────────────────────
+        send("__METHOD__:Conoscenza Base\n");
         send("Generazione da conoscenza base...\n");
         const kStream = await client.messages.stream({
           model: "claude-sonnet-4-6",

@@ -8,6 +8,7 @@ import {
   FileText,
   Users,
   Settings,
+  Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSession } from "next-auth/react";
@@ -15,6 +16,7 @@ import { useSession } from "next-auth/react";
 const navItems = [
   { href: "/dashboard", label: "Home", icon: LayoutDashboard },
   { href: "/pipeline", label: "Pipeline", icon: GitBranch },
+  { href: "/leads", label: "Leads", icon: Sparkles },
   { href: "/reports", label: "Report", icon: FileText },
   { href: "/clients", label: "Clienti", icon: Users },
 ];

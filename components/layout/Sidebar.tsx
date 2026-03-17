@@ -15,6 +15,7 @@ import {
   X,
   ChevronRight,
   Sparkles,
+  Search,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -22,8 +23,9 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/pipeline", label: "Pipeline", icon: GitBranch, sub: [
-    { href: "/pipeline/discover", label: "Scopri Lead", icon: Sparkles },
+  { href: "/pipeline", label: "Pipeline", icon: GitBranch },
+  { href: "/leads", label: "Leads", icon: Sparkles, sub: [
+    { href: "/leads/discover", label: "Nuova ricerca", icon: Search },
   ]},
   { href: "/reports", label: "Report", icon: FileText },
   { href: "/clients", label: "Clienti", icon: Users },

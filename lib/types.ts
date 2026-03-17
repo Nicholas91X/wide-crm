@@ -108,3 +108,32 @@ export const ESITI_REPORT = [
 ] as const;
 
 export const STATI_CONTRATTO = ["Attivo", "In scadenza", "Sospeso", "Chiuso"] as const;
+
+export type SearchMetodo = "Tavily" | "Web Search" | "Conoscenza Base";
+
+export interface SearchLog {
+  id: string;
+  createdTime: string;
+  titolo: string;
+  settore: string;
+  territorio: string;
+  tipoAttivita: string;
+  criteriAggiuntivi: string;
+  numRichiesti: number;
+  numTrovati: number;
+  numAggiunti: number;
+  effettuataDa: string;
+  dataRicerca: string;
+  metodo: SearchMetodo | string;
+  leads: DiscoveredLeadSnapshot[];
+}
+
+export interface DiscoveredLeadSnapshot {
+  nomeAzienda: string;
+  settore: string;
+  territorio: string;
+  sitoWeb: string;
+  profiloSocial: string;
+  note: string;
+  aggiunto: boolean;
+}
