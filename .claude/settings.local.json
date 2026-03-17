@@ -8,7 +8,9 @@
       "mcp__claude_ai_Notion__notion-update-data-source",
       "Bash(node:*)",
       "mcp__claude_ai_Notion__notion-search",
-      "mcp__claude_ai_Notion__notion-create-database"
+      "mcp__claude_ai_Notion__notion-create-database",
+      "Bash(mkdir:*)",
+      "Bash(cd:*)"
     ]
   }
 }

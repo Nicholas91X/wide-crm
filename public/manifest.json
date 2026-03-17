@@ -1,0 +1,36 @@
+{
+  "name": "WIDE CRM",
+  "short_name": "WIDE",
+  "description": "CRM intelligente per WIDE Digital Agency. Gestisci lead, pipeline commerciale e report AI in un'unica piattaforma.",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#0d0d0d",
+  "background_color": "#0a0a0a",
+  "categories": ["business", "productivity"],
+  "lang": "it",
+  "icons": [
+    {
+      "src": "/icons/icon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
