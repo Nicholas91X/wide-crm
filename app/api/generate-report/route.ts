@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import Anthropic from "@anthropic-ai/sdk";
-import { updateLead, createReport } from "@/lib/notion";
+import { updateLead, createReport, logAction } from "@/lib/notion";
 import { createHash } from "crypto";
 
 // Simple in-memory rate limiter: max 10 req/hour per user
@@ -194,6 +194,14 @@ Usa la struttura e il formato markdown esatti indicati nel system prompt.`;
           stato: "Report completato",
           urlReport: `/r/${report.id}`,
           dataCreazioneReport: new Date().toISOString().split("T")[0],
+        }).catch(() => {});
+
+        logAction({
+          azione: "Generazione",
+          entita: "Report",
+          nomeEntita: `${companyName} — Analisi Digitale`,
+          entitaId: report.id,
+          eseguitaDa: email,
         }).catch(() => {});
 
         // Send report ID to client

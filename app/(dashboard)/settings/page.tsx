@@ -1,7 +1,9 @@
 import { getAllowedUsers } from "@/lib/auth";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Shield } from "lucide-react";
+import Link from "next/link";
 
 function RoleBadge({ role }: { role: string }) {
   const colors: Record<string, string> = {
@@ -16,7 +18,9 @@ function RoleBadge({ role }: { role: string }) {
   );
 }
 
-export default function SettingsPage() {
+export default async function SettingsPage() {
+  const session = await getServerSession(authOptions);
+  const role = (session?.user as any)?.role;
   const users = getAllowedUsers();
   const pipelineId = process.env.NOTION_PIPELINE_DB_ID ?? "";
   const reportsId = process.env.NOTION_REPORTS_DB_ID ?? "";
@@ -64,6 +68,24 @@ export default function SettingsPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Audit Log — admin only */}
+      {role === "admin" && (
+        <Link href="/settings/logs">
+          <Card className="bg-[#141414] border-[#1f1f1f] hover:border-[#c9a96e]/30 transition-colors cursor-pointer">
+            <CardContent className="flex items-center gap-4 py-5">
+              <div className="w-10 h-10 rounded-xl bg-[#c9a96e]/10 border border-[#c9a96e]/20 flex items-center justify-center flex-shrink-0">
+                <Shield size={18} className="text-[#c9a96e]" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-[#f5f5f5]">Log Attività</p>
+                <p className="text-xs text-[#555] mt-0.5">Registro di tutte le operazioni: creazioni, modifiche, cancellazioni</p>
+              </div>
+              <ExternalLink size={14} className="text-[#444]" />
+            </CardContent>
+          </Card>
+        </Link>
+      )}
 
       {/* Notion databases */}
       <Card className="bg-[#141414] border-[#1f1f1f]">

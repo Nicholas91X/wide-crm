@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { createLead, getLeads } from "@/lib/notion";
+import { createLead, getLeads, logAction } from "@/lib/notion";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -59,6 +59,17 @@ export async function POST(req: NextRequest) {
     if (r.status === "fulfilled") return r.value;
     return { ...leads[i], status: "error", reason: (r.reason as any)?.message ?? "Errore sconosciuto" };
   });
+
+  const numCreated = output.filter((r: any) => r.status === "created").length;
+  if (numCreated > 0) {
+    logAction({
+      azione: "Creazione",
+      entita: "Lead",
+      nomeEntita: `${numCreated} lead aggiunti via AI Discovery`,
+      eseguitaDa: session.user?.email ?? "unknown",
+      dettagli: output.filter((r: any) => r.status === "created").map((r: any) => r.nomeAzienda).join(", "),
+    }).catch(() => {});
+  }
 
   return NextResponse.json({ results: output });
 }

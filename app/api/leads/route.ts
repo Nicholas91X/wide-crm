@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { getLeads, createLead } from "@/lib/notion";
+import { getLeads, createLead, logAction } from "@/lib/notion";
 
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -34,6 +34,13 @@ export async function POST(req: NextRequest) {
   try {
     const data = await req.json();
     const lead = await createLead({ ...data, inseritoDA: session.user?.email ?? "" });
+    logAction({
+      azione: "Creazione",
+      entita: "Lead",
+      nomeEntita: lead.nomeAzienda,
+      entitaId: lead.id,
+      eseguitaDa: session.user?.email ?? "unknown",
+    }).catch(() => {});
     return NextResponse.json(lead, { status: 201 });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });

@@ -6,6 +6,7 @@ const PIPELINE_DB = process.env.NOTION_PIPELINE_DB_ID!;
 const REPORTS_DB = process.env.NOTION_REPORTS_DB_ID!;
 const CLIENTS_DB = process.env.NOTION_CLIENTS_DB_ID!;
 const SEARCHES_DB = process.env.NOTION_SEARCHES_DB_ID!;
+const AUDIT_DB = process.env.NOTION_AUDIT_DB_ID!;
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -459,6 +460,10 @@ export async function createSearchLog(data: {
   return mapSearchLog(page);
 }
 
+export async function deleteLead(id: string) {
+  await notion.pages.update({ page_id: id, archived: true });
+}
+
 export async function deleteReport(id: string) {
   await notion.pages.update({ page_id: id, archived: true });
 }
@@ -506,4 +511,61 @@ export async function createClient(data: {
     },
   });
   return mapClient(page);
+}
+
+// ─── Audit Log ────────────────────────────────────────────────────────────────
+
+export type AuditAzione = "Creazione" | "Modifica" | "Cancellazione" | "Generazione" | "Ricerca" | "Accesso";
+export type AuditEntita = "Lead" | "Report" | "Cliente" | "Ricerca Lead";
+
+export async function logAction(data: {
+  azione: AuditAzione;
+  entita: AuditEntita;
+  nomeEntita: string;
+  entitaId?: string;
+  eseguitaDa: string;
+  dettagli?: string;
+}) {
+  if (!AUDIT_DB) return;
+  try {
+    await notion.pages.create({
+      parent: { database_id: AUDIT_DB },
+      properties: {
+        Titolo: { title: [{ text: { content: `${data.azione} ${data.entita}: ${data.nomeEntita}` } }] },
+        Azione: { select: { name: data.azione } },
+        "Entità": { select: { name: data.entita } },
+        "Nome Entità": { rich_text: [{ text: { content: data.nomeEntita.slice(0, 2000) } }] },
+        ...(data.entitaId && { "Entità ID": { rich_text: [{ text: { content: data.entitaId } }] } }),
+        "Eseguita Da": { rich_text: [{ text: { content: data.eseguitaDa } }] },
+        Data: { date: { start: new Date().toISOString() } },
+        ...(data.dettagli && { Dettagli: { rich_text: [{ text: { content: data.dettagli.slice(0, 2000) } }] } }),
+      },
+    });
+  } catch {
+    // Fire-and-forget: never block on audit errors
+  }
+}
+
+function mapAuditLog(page: any) {
+  return {
+    id: page.id,
+    createdTime: page.created_time,
+    titolo: richText(page, "Titolo"),
+    azione: selectVal(page, "Azione"),
+    entita: selectVal(page, "Entità"),
+    nomeEntita: richText(page, "Nome Entità"),
+    entitaId: richText(page, "Entità ID"),
+    eseguitaDa: richText(page, "Eseguita Da"),
+    data: dateVal(page, "Data"),
+    dettagli: richText(page, "Dettagli"),
+  };
+}
+
+export async function getAuditLogs(limit = 100) {
+  const response = await notion.databases.query({
+    database_id: AUDIT_DB,
+    sorts: [{ timestamp: "created_time", direction: "descending" }],
+    page_size: limit,
+  });
+  return response.results.map(mapAuditLog);
 }

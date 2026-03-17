@@ -30,6 +30,7 @@ import {
   Save,
   CheckCircle,
   ExternalLink,
+  Trash2,
 } from "lucide-react";
 import {
   Lead,
@@ -51,6 +52,7 @@ export default function LeadDetailPage() {
   const [lead, setLead] = useState<Lead | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [form, setForm] = useState<Partial<Lead>>({});
 
   // Report generation
@@ -103,6 +105,21 @@ export default function LeadDetailPage() {
       toast.error("Errore nel salvataggio");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function deleteLead() {
+    if (!confirm(`Eliminare definitivamente "${lead?.nomeAzienda}"? L'operazione non può essere annullata.`)) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/leads/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error();
+      toast.success("Lead eliminato");
+      router.push("/pipeline");
+    } catch {
+      toast.error("Errore durante l'eliminazione");
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -536,6 +553,15 @@ export default function LeadDetailPage() {
                     disabled={saving}
                   >
                     <CheckCircle size={16} className="mr-2" /> Converti in Cliente
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full border-red-900/40 text-red-400/70 hover:bg-red-900/20 hover:text-red-400 h-10 font-bold text-xs mt-2"
+                    onClick={deleteLead}
+                    disabled={deleting || saving}
+                  >
+                    {deleting ? <Loader2 size={16} className="mr-2 animate-spin" /> : <Trash2 size={16} className="mr-2" />}
+                    Elimina Lead
                   </Button>
                 </div>
               )}
