@@ -134,6 +134,9 @@ export default function LeadDetailPage() {
           companyName: lead.nomeAzienda,
           sector: lead.settore,
           territory: lead.territorio,
+          sitoWeb: lead.sitoWeb,
+          profiloSocial: lead.profiloSocial,
+          note: lead.note,
           additionalInfo,
         }),
       });

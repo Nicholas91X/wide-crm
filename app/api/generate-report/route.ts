@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { leadId, companyName, sector, territory, additionalInfo } =
+  const { leadId, companyName, sector, territory, sitoWeb, profiloSocial, note, additionalInfo } =
     await req.json();
 
   if (!leadId || !companyName) {
@@ -132,9 +132,14 @@ DATI AZIENDA:
 - Nome: ${companyName}
 - Settore: ${sector || "Non specificato"}
 - Territorio: ${territory || "Non specificato"}
+${sitoWeb ? `- Sito web: ${sitoWeb}` : "- Sito web: non fornito"}
+${profiloSocial ? `- Profilo social principale: ${profiloSocial}` : ""}
+${note ? `- Note interne: ${note}` : ""}
 ${additionalInfo ? `- Informazioni aggiuntive: ${additionalInfo}` : ""}
 
-Usa la struttura e il formato markdown esatti indicati nel system prompt. Sii specifico su questa azienda e questo territorio — ricerca e cita dati reali dove possibile.`;
+IMPORTANTE: usa i dati forniti sopra come punto di partenza reale. Se il sito web è indicato, l'azienda CE L'HA — analizzane il contenuto, la qualità e le lacune. Non affermare mai che manca qualcosa che è esplicitamente fornito nei dati.
+
+Usa la struttura e il formato markdown esatti indicati nel system prompt.`;
 
   const encoder = new TextEncoder();
   let fullContent = "";
