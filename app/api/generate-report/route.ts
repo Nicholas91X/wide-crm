@@ -151,6 +151,13 @@ Usa la struttura e il formato markdown esatti indicati nel system prompt.`;
           model: "claude-sonnet-4-6",
           max_tokens: 8192,
           system: systemPrompt,
+          tools: [
+            {
+              type: "web_search_20250305" as any,
+              name: "web_search",
+              max_uses: 5,
+            } as any,
+          ],
           messages: [{ role: "user", content: userPrompt }],
         });
 
