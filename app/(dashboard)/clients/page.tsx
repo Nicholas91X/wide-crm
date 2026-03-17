@@ -1,15 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { TrendingUp } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { TrendingUp, Download } from "lucide-react";
 import { Client } from "@/lib/types";
 
 function formatDate(d: string) {
@@ -31,10 +27,25 @@ function StatoBadge({ stato }: { stato: string }) {
   );
 }
 
+function exportClientsCSV(clients: Client[]) {
+  const headers = ["Nome", "Settore", "Valore mensile", "Data inizio", "Prossimo rinnovo", "Stato contratto", "Responsabile"];
+  const rows = clients.map(c => [
+    c.nome, c.settore, c.valoreNetto?.toString() ?? "", c.dataInizio, c.prossimoRinnovo, c.statoContratto, c.responsabile,
+  ].map(v => `"${(v || "").replace(/"/g, '""')}"`).join(","));
+  const csv = [headers.join(","), ...rows].join("\n");
+  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `clienti_${new Date().toISOString().split("T")[0]}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 export default function ClientsPage() {
+  const router = useRouter();
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selected, setSelected] = useState<Client | null>(null);
 
   async function load() {
     setLoading(true);
@@ -63,13 +74,24 @@ export default function ClientsPage() {
           <h1 className="text-2xl font-bold text-[#f5f5f5]">Clienti</h1>
           <p className="text-[#888] text-sm mt-1">{clients.length} clienti totali</p>
         </div>
-        <div className="flex items-center gap-2 bg-[#141414] border border-[#1f1f1f] rounded-lg px-4 py-2">
-          <TrendingUp size={16} className="text-[#c9a96e]" />
-          <div>
-            <p className="text-xs text-[#888]">Fatturato mensile</p>
-            <p className="text-lg font-bold text-[#c9a96e]">
-              €{totalMonthly.toLocaleString("it-IT")}
-            </p>
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => exportClientsCSV(clients)}
+            disabled={clients.length === 0}
+            className="border-white/10 text-[#888] hover:text-[#f5f5f5] font-bold h-8 text-xs"
+          >
+            <Download size={14} className="mr-1" /> CSV
+          </Button>
+          <div className="flex items-center gap-2 bg-[#141414] border border-[#1f1f1f] rounded-lg px-4 py-2">
+            <TrendingUp size={16} className="text-[#c9a96e]" />
+            <div>
+              <p className="text-xs text-[#888]">Fatturato mensile</p>
+              <p className="text-lg font-bold text-[#c9a96e]">
+                €{totalMonthly.toLocaleString("it-IT")}
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -100,7 +122,7 @@ export default function ClientsPage() {
                   <tr
                     key={c.id}
                     className="border-b border-[#1f1f1f] last:border-0 hover:bg-[#1a1a1a] transition-colors cursor-pointer"
-                    onClick={() => setSelected(c)}
+                    onClick={() => router.push(`/clients/${c.id}`)}
                   >
                     <td className="px-4 py-3 font-medium text-[#f5f5f5]">{c.nome || "-"}</td>
                     <td className="px-4 py-3 text-[#888]">{c.settore || "-"}</td>
@@ -118,38 +140,6 @@ export default function ClientsPage() {
           </div>
         </Card>
       )}
-
-      {/* Detail modal */}
-      <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
-        <DialogContent className="bg-[#141414] border-[#1f1f1f]">
-          <DialogHeader>
-            <DialogTitle className="text-[#f5f5f5]">{selected?.nome}</DialogTitle>
-          </DialogHeader>
-          {selected && (
-            <div className="space-y-3 text-sm">
-              <Row label="Settore" value={selected.settore} />
-              <Row
-                label="Valore mensile"
-                value={selected.valoreNetto ? `€${selected.valoreNetto.toLocaleString("it-IT")}` : "-"}
-                accent
-              />
-              <Row label="Data inizio" value={formatDate(selected.dataInizio)} />
-              <Row label="Prossimo rinnovo" value={formatDate(selected.prossimoRinnovo)} />
-              <Row label="Stato contratto" value={selected.statoContratto} />
-              <Row label="Responsabile" value={selected.responsabile} />
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-}
-
-function Row({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
-  return (
-    <div className="flex justify-between items-center py-2 border-b border-[#1f1f1f] last:border-0">
-      <span className="text-[#888]">{label}</span>
-      <span className={accent ? "text-[#c9a96e] font-semibold" : "text-[#f5f5f5]"}>{value || "-"}</span>
     </div>
   );
 }

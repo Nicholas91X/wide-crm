@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Copy, ArrowLeft, ExternalLink, Trash2 } from "lucide-react";
+import { Copy, ArrowLeft, ExternalLink, Trash2, Loader2, RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Report, STATI_REPORT, ESITI_REPORT } from "@/lib/types";
 
@@ -40,6 +40,11 @@ export default function ReportDetailPage() {
   const [tokenValid, setTokenValid] = useState(false);
   const [invalidToken, setInvalidToken] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [regenerating, setRegenerating] = useState(false);
+  const [regenContent, setRegenContent] = useState("");
+  const [regenDone, setRegenDone] = useState(false);
+  const [showRegenModal, setShowRegenModal] = useState(false);
+  const [regenInfo, setRegenInfo] = useState("");
 
   useEffect(() => {
     async function load() {
@@ -101,6 +106,48 @@ export default function ReportDetailPage() {
       router.push("/reports");
     } catch {
       toast.error("Errore nell'eliminazione");
+    }
+  }
+
+  async function regenerateReport() {
+    if (!report?.leadId) {
+      toast.error("Questo report non ha un lead associato");
+      return;
+    }
+    setRegenerating(true);
+    setRegenContent("");
+    setRegenDone(false);
+    try {
+      const res = await fetch("/api/generate-report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          leadId: report.leadId,
+          companyName: report.azienda,
+          sector: report.settore,
+          additionalInfo: regenInfo,
+        }),
+      });
+      if (!res.ok) throw new Error("Errore nella rigenerazione");
+      const reader = res.body!.getReader();
+      const decoder = new TextDecoder();
+      let full = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value, { stream: true });
+        for (const line of chunk.split("\n")) {
+          if (line.startsWith("__REPORT_ID__:") || line.startsWith("__ERROR__:")) continue;
+          full += line + "\n";
+          setRegenContent(prev => prev + line + "\n");
+        }
+      }
+      setRegenDone(true);
+      toast.success("Report rigenerato — ricarica la pagina per vederlo aggiornato");
+    } catch (err: any) {
+      toast.error(err.message || "Errore nella rigenerazione");
+    } finally {
+      setRegenerating(false);
     }
   }
 
@@ -244,6 +291,17 @@ export default function ReportDetailPage() {
                   </Button>
                 )}
 
+                {report.leadId && (
+                  <Button
+                    variant="outline"
+                    className="w-full border-[#c9a96e]/20 text-[#c9a96e]/80 hover:bg-[#c9a96e]/10 text-xs h-10 font-bold"
+                    onClick={() => setShowRegenModal(true)}
+                    disabled={regenerating}
+                  >
+                    <RefreshCw size={14} className="mr-2" /> Rigenera Report AI
+                  </Button>
+                )}
+
                 <Button
                   variant="outline"
                   className="w-full border-red-900/30 text-red-400 hover:bg-red-900/20 text-xs h-10 font-medium mt-2"
@@ -269,6 +327,53 @@ export default function ReportDetailPage() {
           </Card>
         </div>
       </div>
+
+      {/* Regen modal */}
+      {showRegenModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4" onClick={() => { if (!regenerating) setShowRegenModal(false); }}>
+          <div className="absolute inset-0 bg-black/60" />
+          <div className="relative w-full max-w-2xl bg-[#141414] border border-[#1f1f1f] rounded-xl p-6 space-y-4 max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <h3 className="text-base font-bold text-[#f5f5f5]">Rigenera Report — {report.azienda}</h3>
+            {!regenerating && !regenDone && (
+              <div className="space-y-4">
+                <div className="space-y-1">
+                  <label className="text-[10px] uppercase text-[#555] font-bold tracking-tight">Info aggiuntive (opzionale)</label>
+                  <textarea
+                    value={regenInfo}
+                    onChange={e => setRegenInfo(e.target.value)}
+                    placeholder="Aggiornamenti, nuove info sull'azienda..."
+                    rows={3}
+                    className="w-full bg-[#0d0d0d] border border-[#1f1f1f] text-[#f5f5f5] text-sm rounded-md px-3 py-2 resize-none outline-none focus:border-[#c9a96e]/30"
+                  />
+                </div>
+                <div className="flex gap-3">
+                  <button onClick={() => setShowRegenModal(false)} className="px-4 py-2 rounded-md border border-[#1f1f1f] text-[#888] text-sm hover:text-[#f5f5f5]">Annulla</button>
+                  <button onClick={regenerateReport} className="flex-1 bg-[#c9a96e] hover:bg-[#b8945a] text-[#0a0a0a] font-bold px-4 py-2 rounded-md text-sm">Avvia Rigenerazione</button>
+                </div>
+              </div>
+            )}
+            {(regenerating || regenContent) && (
+              <div className="space-y-3">
+                {regenerating && (
+                  <div className="flex items-center gap-2 text-[#c9a96e] text-sm">
+                    <Loader2 size={16} className="animate-spin" />
+                    Rigenerazione in corso...
+                  </div>
+                )}
+                <div className="bg-[#0d0d0d] border border-[#1f1f1f] rounded-lg p-4 max-h-72 overflow-y-auto text-sm">
+                  <ReactMarkdown>{regenContent}</ReactMarkdown>
+                  {regenerating && <span className="inline-block w-2 h-4 bg-[#c9a96e] animate-pulse ml-1" />}
+                </div>
+                {regenDone && (
+                  <div className="flex gap-3">
+                    <button onClick={() => { setShowRegenModal(false); window.location.reload(); }} className="flex-1 bg-[#c9a96e] hover:bg-[#b8945a] text-[#0a0a0a] font-bold px-4 py-2 rounded-md text-sm">Chiudi e aggiorna</button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

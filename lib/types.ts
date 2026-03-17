@@ -50,6 +50,8 @@ export interface Client {
   prossimoRinnovo: string;
   statoContratto: string;
   responsabile: string;
+  note: string;
+  sitoWeb: string;
 }
 
 export const STATI_LEAD = [

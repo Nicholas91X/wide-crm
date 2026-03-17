@@ -31,6 +31,7 @@ import {
   CheckCircle,
   ExternalLink,
   Trash2,
+  MessageSquare,
 } from "lucide-react";
 import {
   Lead,
@@ -54,6 +55,11 @@ export default function LeadDetailPage() {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [form, setForm] = useState<Partial<Lead>>({});
+
+  const [activities, setActivities] = useState<Array<{ date: string; text: string; author: string }>>([]);
+  const [activitiesLoading, setActivitiesLoading] = useState(true);
+  const [newActivity, setNewActivity] = useState("");
+  const [addingActivity, setAddingActivity] = useState(false);
 
   // Report generation
   const [showReportModal, setShowReportModal] = useState(false);
@@ -79,6 +85,7 @@ export default function LeadDetailPage() {
 
   useEffect(() => {
     loadLead();
+    loadActivities();
     if (searchParams.get("generate") === "1") {
       setShowReportModal(true);
     }
@@ -133,6 +140,38 @@ export default function LeadDetailPage() {
       toast.error("Errore nell'acquisizione");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function loadActivities() {
+    try {
+      const res = await fetch(`/api/leads/${id}/activities`);
+      const data = await res.json();
+      setActivities(Array.isArray(data) ? data : []);
+    } catch {
+      setActivities([]);
+    } finally {
+      setActivitiesLoading(false);
+    }
+  }
+
+  async function addActivity() {
+    if (!newActivity.trim()) return;
+    setAddingActivity(true);
+    try {
+      const res = await fetch(`/api/leads/${id}/activities`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: newActivity }),
+      });
+      if (!res.ok) throw new Error();
+      setNewActivity("");
+      await loadActivities();
+      toast.success("Nota aggiunta");
+    } catch {
+      toast.error("Errore nell'aggiunta della nota");
+    } finally {
+      setAddingActivity(false);
     }
   }
 
@@ -568,6 +607,55 @@ export default function LeadDetailPage() {
             </CardContent>
           </Card>
         </div>
+      </div>
+
+      {/* Activity Log */}
+      <div className="space-y-4 max-w-6xl mx-auto">
+        <Card className="glass-dark border-white/5">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-bold uppercase tracking-widest text-[#555] flex items-center gap-2">
+              <MessageSquare size={14} /> Storico Attività
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {canEdit && (
+              <div className="flex gap-2">
+                <input
+                  value={newActivity}
+                  onChange={e => setNewActivity(e.target.value)}
+                  onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); addActivity(); }}}
+                  placeholder="Aggiungi una nota (es: Chiamato, ha risposto positivamente...)"
+                  className="flex-1 bg-[#0d0d0d] border border-white/5 rounded-md px-3 py-2 text-sm text-[#f5f5f5] placeholder:text-[#333] outline-none focus:border-[#c9a96e]/30 transition-colors"
+                  disabled={addingActivity}
+                />
+                <Button onClick={addActivity} disabled={addingActivity || !newActivity.trim()} className="bg-[#c9a96e] hover:bg-[#b8945a] text-[#0a0a0a] font-bold px-4">
+                  {addingActivity ? <Loader2 size={14} className="animate-spin" /> : "Aggiungi"}
+                </Button>
+              </div>
+            )}
+            {activitiesLoading ? (
+              <div className="space-y-2">
+                {[1,2].map(i => <div key={i} className="h-12 bg-white/5 rounded-lg animate-pulse" />)}
+              </div>
+            ) : activities.length === 0 ? (
+              <p className="text-[#444] text-sm text-center py-4">Nessuna attività registrata</p>
+            ) : (
+              <div className="space-y-2">
+                {activities.map((a, i) => (
+                  <div key={i} className="flex gap-3 py-2 border-b border-white/5 last:border-0">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#c9a96e]/40 mt-2 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-[#ddd]">{a.text}</p>
+                      <p className="text-[10px] text-[#444] mt-0.5">
+                        {new Date(a.date).toLocaleString("it-IT", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })} · {a.author}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
       {/* Report generation modal */}

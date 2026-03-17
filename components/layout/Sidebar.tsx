@@ -21,6 +21,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { FollowupBadge } from "@/components/FollowupBadge";
+import { SearchModal } from "@/components/SearchModal";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -41,11 +42,12 @@ export default function Sidebar() {
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
       {/* Logo */}
-      <div className="px-6 py-6 border-b border-[#1f1f1f]">
-        <span className="text-2xl font-bold tracking-widest text-[#c9a96e]">
-          WIDE
-        </span>
-        <span className="text-xs text-[#888] ml-1 tracking-wider">CRM</span>
+      <div className="px-6 py-6 border-b border-[#1f1f1f] flex items-center justify-between">
+        <div>
+          <span className="text-2xl font-bold tracking-widest text-[#c9a96e]">WIDE</span>
+          <span className="text-xs text-[#888] ml-1 tracking-wider">CRM</span>
+        </div>
+        <SearchModal />
       </div>
 
       {/* Nav */}

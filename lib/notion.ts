@@ -110,6 +110,8 @@ function mapClient(page: any) {
     prossimoRinnovo: dateVal(page, "Prossimo rinnovo"),
     statoContratto: selectVal(page, "Stato contratto"),
     responsabile: richText(page, "Responsabile"),
+    note: richText(page, "Note"),
+    sitoWeb: urlVal(page, "Sito Web"),
   };
 }
 
@@ -513,6 +515,43 @@ export async function createClient(data: {
   return mapClient(page);
 }
 
+export async function getClient(id: string) {
+  const page = await notion.pages.retrieve({ page_id: id });
+  return mapClient(page);
+}
+
+export async function updateClient(
+  id: string,
+  data: Partial<{
+    nome: string;
+    settore: string;
+    valoreNetto: number;
+    dataInizio: string;
+    prossimoRinnovo: string;
+    statoContratto: string;
+    responsabile: string;
+    sitoWeb: string;
+    note: string;
+  }>
+) {
+  const props: any = {};
+  if (data.nome !== undefined) props["Nome Cliente"] = { title: [{ text: { content: data.nome } }] };
+  if (data.settore !== undefined) props["Settore"] = { select: { name: data.settore } };
+  if (data.valoreNetto !== undefined) props["Valore mensile"] = { number: data.valoreNetto };
+  if (data.dataInizio !== undefined) props["Data inizio"] = data.dataInizio ? { date: { start: data.dataInizio } } : { date: null };
+  if (data.prossimoRinnovo !== undefined) props["Prossimo rinnovo"] = data.prossimoRinnovo ? { date: { start: data.prossimoRinnovo } } : { date: null };
+  if (data.statoContratto !== undefined) props["Stato contratto"] = { select: { name: data.statoContratto } };
+  if (data.responsabile !== undefined) props["Responsabile"] = { rich_text: [{ text: { content: data.responsabile } }] };
+  if (data.sitoWeb !== undefined) props["Sito Web"] = { url: data.sitoWeb || null };
+  if (data.note !== undefined) props["Note"] = { rich_text: [{ text: { content: data.note } }] };
+  const page = await notion.pages.update({ page_id: id, properties: props });
+  return mapClient(page);
+}
+
+export async function deleteClient(id: string) {
+  await notion.pages.update({ page_id: id, archived: true });
+}
+
 // ─── Audit Log ────────────────────────────────────────────────────────────────
 
 export type AuditAzione = "Creazione" | "Modifica" | "Cancellazione" | "Generazione" | "Ricerca" | "Accesso";
@@ -568,6 +607,38 @@ export async function getAuditLogs(limit = 100) {
     page_size: limit,
   });
   return response.results.map(mapAuditLog);
+}
+
+export async function getLeadActivities(leadId: string): Promise<Array<{ date: string; text: string; author: string }>> {
+  try {
+    const blocks = await notion.blocks.children.list({ block_id: leadId, page_size: 100 });
+    const activities: Array<{ date: string; text: string; author: string }> = [];
+    for (const block of blocks.results as any[]) {
+      if (block.type !== "paragraph") continue;
+      const text = block.paragraph.rich_text?.[0]?.plain_text ?? "";
+      // Format: "DATETIME||AUTHOR||TEXT"
+      const parts = text.split("||");
+      if (parts.length === 3) {
+        activities.push({ date: parts[0], author: parts[1], text: parts[2] });
+      }
+    }
+    return activities.reverse(); // newest first
+  } catch {
+    return [];
+  }
+}
+
+export async function addLeadActivity(leadId: string, text: string, author: string): Promise<void> {
+  const timestamp = new Date().toISOString();
+  const content = `${timestamp}||${author}||${text}`;
+  await notion.blocks.children.append({
+    block_id: leadId,
+    children: [{
+      object: "block",
+      type: "paragraph",
+      paragraph: { rich_text: [{ type: "text", text: { content: content.slice(0, 2000) } }] },
+    }],
+  });
 }
 
 export async function getLeadsWithFollowupDue() {

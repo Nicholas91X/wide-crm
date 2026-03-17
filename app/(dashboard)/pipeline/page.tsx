@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Plus, MoreHorizontal, List, Columns, Filter, Sparkles, GripVertical } from "lucide-react";
+import { Plus, MoreHorizontal, List, Columns, Filter, Sparkles, GripVertical, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
@@ -34,6 +34,22 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
+
+function exportLeadsCSV(leads: Lead[]) {
+  const headers = ["Nome Azienda", "Settore", "Territorio", "Stato", "Score", "Canale", "Data primo contatto", "Data follow-up", "Risposta", "Sito Web", "Inserito da"];
+  const rows = leads.map(l => [
+    l.nomeAzienda, l.settore, l.territorio, l.stato, l.score, l.canale,
+    l.dataPrimoContatto, l.dataFollowUp, l.risposta, l.sitoWeb, l.inseritoDA,
+  ].map(v => `"${(v || "").replace(/"/g, '""')}"`).join(","));
+  const csv = [headers.join(","), ...rows].join("\n");
+  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `pipeline_${new Date().toISOString().split("T")[0]}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 function StatoBadge({ stato }: { stato: string }) {
   const colors: Record<string, string> = {
@@ -203,25 +219,36 @@ export default function PipelinePage() {
               <span className="text-xs hidden sm:inline">Kanban</span>
             </Button>
           </div>
-          {canEdit && (
-            <div className="flex gap-2">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => router.push("/pipeline/discover")}
-                className="border-[#c9a96e]/20 text-[#c9a96e] hover:bg-[#c9a96e]/10 font-bold h-8 text-xs"
-              >
-                <Sparkles size={14} className="mr-1" /> Scopri
-              </Button>
-              <Button
-                size="sm"
-                onClick={() => router.push("/pipeline/new")}
-                className="bg-[#c9a96e] hover:bg-[#b8945a] text-[#0a0a0a] font-bold h-8"
-              >
-                <Plus size={16} className="mr-1" /> Nuovo
-              </Button>
-            </div>
-          )}
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => exportLeadsCSV(leads)}
+              disabled={leads.length === 0}
+              className="border-white/10 text-[#888] hover:text-[#f5f5f5] font-bold h-8 text-xs"
+            >
+              <Download size={14} className="mr-1" /> CSV
+            </Button>
+            {canEdit && (
+              <>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => router.push("/pipeline/discover")}
+                  className="border-[#c9a96e]/20 text-[#c9a96e] hover:bg-[#c9a96e]/10 font-bold h-8 text-xs"
+                >
+                  <Sparkles size={14} className="mr-1" /> Scopri
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => router.push("/pipeline/new")}
+                  className="bg-[#c9a96e] hover:bg-[#b8945a] text-[#0a0a0a] font-bold h-8"
+                >
+                  <Plus size={16} className="mr-1" /> Nuovo
+                </Button>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
