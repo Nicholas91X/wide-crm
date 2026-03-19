@@ -89,6 +89,15 @@ export const SETTORI = [
   "Professionale",
   "Immobiliare",
   "Benessere",
+  "Software/SaaS",
+  "Edilizia/Costruzioni",
+  "E-commerce",
+  "Manifatturiero",
+  "Turismo/Hotel",
+  "Servizi B2B",
+  "Pharma/Medicale",
+  "Artigianato",
+  "Logistica",
   "Altro",
 ] as const;
 
