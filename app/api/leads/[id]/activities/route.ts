@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { getLeadActivities, addLeadActivity } from "@/lib/notion";
+import { getLeadActivities, addLeadActivity } from "@/lib/db";
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
@@ -22,7 +22,8 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   try {
     const { text } = await req.json();
     if (!text?.trim()) return NextResponse.json({ error: "Testo obbligatorio" }, { status: 400 });
-    await addLeadActivity(params.id, text.trim(), session.user?.email ?? "unknown");
+    // In lib/db.ts, signature is addLeadActivity(leadId, author, content)
+    await addLeadActivity(params.id, session.user?.email ?? "unknown", text.trim());
     return NextResponse.json({ success: true });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });

@@ -16,9 +16,11 @@ interface TavilyResult {
 function buildTavilyQueries(settore: string, territorio: string, tipoAttivita?: string): string[] {
   const activity = tipoAttivita || settore.toLowerCase();
   return [
-    `${activity} ${territorio} sito web contatti`,
-    `${activity} ${territorio} PagineBianche`,
-    `${settore} imprese ${territorio} Google Maps`,
+    `${activity} ${territorio} sito web ufficiale`,
+    `${activity} ${territorio} instagram facebook profilo social`,
+    `${activity} ${territorio} tiktok azienda profilo`,
+    `${activity} ${territorio} linkedin azienda`,
+    `${activity} ${territorio} contatti email telefono`,
   ];
 }
 
@@ -78,22 +80,24 @@ function parseLeadsFromText(text: string): any[] {
 
 const OUTPUT_RULES = `FORMATO OUTPUT — rispetta queste regole alla lettera:
 - Per ogni azienda scrivi ESATTAMENTE su una singola riga (nessuna interruzione di riga nel JSON):
-  __LEAD__:{"nomeAzienda":"...","settore":"...","territorio":"...","sitoWeb":"...","profiloSocial":"...","note":"..."}
+  __LEAD__:{"nomeAzienda":"...","settore":"...","territorio":"...","sitoWeb":"...","profiloSocial":"...","profiloTikTok":"...","note":"..."}
 - JSON valido e compatto su una sola riga
 - Campi obbligatori: nomeAzienda, settore, territorio
-- sitoWeb: URL completo con https:// se disponibile, altrimenti stringa vuota ""
-- profiloSocial: URL profilo social principale (Instagram, Facebook, LinkedIn) se disponibile, altrimenti ""
-- note: 1-2 osservazioni utili per il commerciale (presenza digitale, punti deboli, opportunità)
+- sitoWeb: URL completo con https:// se disponibile, altrimenti ""
+- profiloSocial: PRIORITÀ MASSIMA. Trova l'URL del profilo social più attivo (Instagram, Facebook o LinkedIn). Se ne trovi più di uno, metti il più rilevante per il marketing. Se nessuno, lascia ""
+- profiloTikTok: URL del profilo TikTok se disponibile, altrimenti ""
+- note: Breve analisi della presenza digitale (es. "Sito moderno ma social inattivi", "Ottimo IG, sito mancante", "Nessuna traccia digital")
 - NON scrivere nulla al di fuori delle righe __LEAD__:`;
 
 // ─── System prompts per tier ──────────────────────────────────────────────────
 
-const SYSTEM_TAVILY = `Sei un assistente specializzato nell'estrazione di lead B2B da risultati di ricerca web, per WIDE Digital Agency (agenzia italiana di marketing digitale).
+const SYSTEM_TAVILY = `Sei un assistente specializzato nell'estrazione di lead B2B da risultati di ricerca web per WIDE Digital Agency.
+Il tuo obiettivo è identificare aziende nel territorio indicato e trovare i loro canali digitali (Sito e Social).
 
-Riceverai risultati di ricerca già effettuata. Estrai da essi le aziende che potrebbero essere lead per WIDE.
+Riceverai risultati di ricerca. Estrai da essi le aziende che potrebbero essere lead.
+IMPORTANTE: Se i risultati suggeriscono un profilo social ma non il sito, estrai comunque il lead.
 
-${OUTPUT_RULES}
-- Nelle note indica cosa emerge dai risultati (es. "Sito web presente ma datato", "Solo Facebook attivo")`;
+${OUTPUT_RULES}`;
 
 const SYSTEM_WEBSEARCH = `Sei un assistente specializzato nella ricerca di lead B2B per WIDE Digital Agency (agenzia italiana di marketing digitale).
 

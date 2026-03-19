@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { getLead, updateLead, createClient } from "@/lib/notion";
+import { getLead, updateLead, createClient } from "@/lib/db";
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
@@ -13,6 +13,8 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
   try {
     const lead = await getLead(params.id);
+    if (!lead) return NextResponse.json({ error: "Lead not found" }, { status: 404 });
+
     await updateLead(params.id, { stato: "Acquisito" });
     await createClient({
       nome: lead.nomeAzienda,

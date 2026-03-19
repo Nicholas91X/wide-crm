@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { createLead, getLeads, logAction } from "@/lib/notion";
+import { createLeads, getLeads, logAction } from "@/lib/db";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -28,48 +28,52 @@ export async function POST(req: NextRequest) {
       .map((l) => l.sitoWeb.toLowerCase().trim().replace(/\/$/, ""))
   );
 
-  const results = await Promise.allSettled(
-    leads.map(async (lead: any) => {
-      const name = lead.nomeAzienda?.toLowerCase().trim();
-      const url = lead.sitoWeb?.toLowerCase().trim().replace(/\/$/, "");
+  const leadsToCreate: any[] = [];
+  const results: any[] = [];
 
-      // Duplicate check
-      if (name && existingNames.has(name)) {
-        return { ...lead, status: "duplicate", reason: "Nome azienda già presente nel CRM" };
-      }
-      if (url && existingUrls.has(url)) {
-        return { ...lead, status: "duplicate", reason: "Sito web già presente nel CRM" };
-      }
+  for (const lead of leads) {
+    const name = lead.nomeAzienda?.toLowerCase().trim();
+    const url = lead.sitoWeb?.toLowerCase().trim().replace(/\/$/, "");
 
-      const created = await createLead({
-        nomeAzienda: lead.nomeAzienda,
-        settore: lead.settore || undefined,
-        territorio: lead.territorio || "",
-        sitoWeb: lead.sitoWeb || undefined,
-        profiloSocial: lead.profiloSocial || undefined,
-        note: lead.note || undefined,
-        inseritoDA: session.user?.email ?? "",
+    // Duplicate check
+    if (name && existingNames.has(name)) {
+      results.push({ ...lead, status: "duplicate", reason: "Nome azienda già presente nel CRM" });
+      continue;
+    }
+    if (url && existingUrls.has(url)) {
+      results.push({ ...lead, status: "duplicate", reason: "Sito web già presente nel CRM" });
+      continue;
+    }
+
+    leadsToCreate.push({
+      ...lead,
+      inseritoDA: session.user?.email ?? "",
+    });
+  }
+
+  if (leadsToCreate.length > 0) {
+    try {
+      const createdLeads = await createLeads(leadsToCreate);
+      createdLeads.forEach((l: any, i: number) => {
+        results.push({ ...leadsToCreate[i], status: "created", id: l.id });
       });
+    } catch (err: any) {
+      leadsToCreate.forEach((l) => {
+        results.push({ ...l, status: "error", reason: err.message });
+      });
+    }
+  }
 
-      return { ...lead, status: "created", id: created.id };
-    })
-  );
-
-  const output = results.map((r, i) => {
-    if (r.status === "fulfilled") return r.value;
-    return { ...leads[i], status: "error", reason: (r.reason as any)?.message ?? "Errore sconosciuto" };
-  });
-
-  const numCreated = output.filter((r: any) => r.status === "created").length;
+  const numCreated = results.filter((r: any) => r.status === "created").length;
   if (numCreated > 0) {
     logAction({
       azione: "Creazione",
       entita: "Lead",
       nomeEntita: `${numCreated} lead aggiunti via AI Discovery`,
       eseguitaDa: session.user?.email ?? "unknown",
-      dettagli: output.filter((r: any) => r.status === "created").map((r: any) => r.nomeAzienda).join(", "),
+      dettagli: results.filter((r: any) => r.status === "created").map((r: any) => r.nomeAzienda).join(", "),
     }).catch(() => {});
   }
 
-  return NextResponse.json({ results: output });
+  return NextResponse.json({ results });
 }

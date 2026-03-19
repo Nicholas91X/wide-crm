@@ -16,6 +16,7 @@ import {
   ChevronRight,
   Sparkles,
   Search,
+  Calendar,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -25,10 +26,14 @@ import { SearchModal } from "@/components/SearchModal";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/leads", label: "Leads", icon: Sparkles, sub: [
-    { href: "/leads/discover", label: "Nuova ricerca", icon: Search },
-  ]},
+  {
+    href: "/leads",
+    label: "Leads",
+    icon: Sparkles,
+    sub: [{ href: "/leads/discover", label: "Nuova ricerca", icon: Search }],
+  },
   { href: "/pipeline", label: "Pipeline", icon: GitBranch },
+  { href: "/calendar", label: "Calendario", icon: Calendar },
   { href: "/reports", label: "Report", icon: FileText },
   { href: "/clients", label: "Clienti", icon: Users },
 ];
@@ -44,7 +49,9 @@ export default function Sidebar() {
       {/* Logo */}
       <div className="px-6 py-6 border-b border-[#1f1f1f] flex items-center justify-between">
         <div>
-          <span className="text-2xl font-bold tracking-widest text-[#c9a96e]">WIDE</span>
+          <span className="text-2xl font-bold tracking-widest text-[#c9a96e]">
+            WIDE
+          </span>
           <span className="text-xs text-[#888] ml-1 tracking-wider">CRM</span>
         </div>
         <SearchModal />
@@ -53,7 +60,10 @@ export default function Sidebar() {
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 space-y-1">
         {navItems.map(({ href, label, icon: Icon, sub }: any) => {
-          const active = pathname === href || (href !== "/pipeline" && pathname.startsWith(href)) || (href === "/pipeline" && pathname === "/pipeline");
+          const active =
+            pathname === href ||
+            (href !== "/pipeline" && pathname.startsWith(href)) ||
+            (href === "/pipeline" && pathname === "/pipeline");
           const subActive = sub?.some((s: any) => pathname.startsWith(s.href));
           return (
             <div key={href}>
@@ -72,7 +82,9 @@ export default function Sidebar() {
                   {href === "/pipeline" && <FollowupBadge />}
                 </span>
                 {label}
-                {(active || subActive) && <ChevronRight size={14} className="ml-auto" />}
+                {(active || subActive) && (
+                  <ChevronRight size={14} className="ml-auto" />
+                )}
               </Link>
               {sub && (active || subActive) && (
                 <div className="ml-8 mt-0.5 space-y-0.5">

@@ -11,6 +11,7 @@ export interface Lead {
   profiloSocial: string;
   profiloSocial2: string;
   profiloSocial3: string;
+  profiloTikTok: string;
   canale: string;
   note: string;
   score: string; // "🔴 Basso" | "🟡 Medio" | "🟢 Alto"
@@ -136,6 +137,7 @@ export interface DiscoveredLeadSnapshot {
   territorio: string;
   sitoWeb: string;
   profiloSocial: string;
+  profiloTikTok: string;
   note: string;
   aggiunto: boolean;
 }

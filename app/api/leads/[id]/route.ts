@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { getLead, updateLead, deleteLead, logAction } from "@/lib/notion";
+import { getLead, updateLead, deleteLead, logAction } from "@/lib/db";
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
@@ -49,14 +49,16 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
 
   try {
     const lead = await getLead(params.id);
-    await deleteLead(params.id);
-    logAction({
-      azione: "Cancellazione",
-      entita: "Lead",
-      nomeEntita: lead.nomeAzienda,
-      entitaId: params.id,
-      eseguitaDa: session.user?.email ?? "unknown",
-    }).catch(() => {});
+    if (lead) {
+      await deleteLead(params.id);
+      logAction({
+        azione: "Eliminazione",
+        entita: "Lead",
+        nomeEntita: lead.nomeAzienda,
+        entitaId: params.id,
+        eseguitaDa: session.user?.email ?? "unknown",
+      }).catch(() => {});
+    }
     return NextResponse.json({ success: true });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });

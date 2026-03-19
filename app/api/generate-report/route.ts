@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import Anthropic from "@anthropic-ai/sdk";
-import { updateLead, createReport, logAction } from "@/lib/notion";
+import { updateLead, createReport, logAction } from "@/lib/db";
 import { createHash } from "crypto";
 
 // Simple in-memory rate limiter: max 10 req/hour per user
@@ -174,7 +174,7 @@ Usa la struttura e il formato markdown esatti indicati nel system prompt.`;
           }
         }
 
-        // Save report to Notion
+        // Save report to Supabase
         const token = createHash("sha256")
           .update(leadId + (process.env.NEXTAUTH_SECRET ?? "secret"))
           .digest("hex")
@@ -197,7 +197,7 @@ Usa la struttura e il formato markdown esatti indicati nel system prompt.`;
         }).catch(() => {});
 
         logAction({
-          azione: "Generazione",
+          azione: "Generazione Report" as any,
           entita: "Report",
           nomeEntita: `${companyName} — Analisi Digitale`,
           entitaId: report.id,

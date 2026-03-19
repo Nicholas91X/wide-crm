@@ -12,7 +12,9 @@ function RoleBadge({ role }: { role: string }) {
     viewer: "bg-gray-800 text-gray-400 border-gray-700",
   };
   return (
-    <span className={`inline-flex px-2.5 py-0.5 rounded text-xs font-medium border ${colors[role] ?? colors.viewer}`}>
+    <span
+      className={`inline-flex px-2.5 py-0.5 rounded text-xs font-medium border ${colors[role] ?? colors.viewer}`}
+    >
       {role}
     </span>
   );
@@ -30,7 +32,9 @@ export default async function SettingsPage() {
     <div className="max-w-2xl space-y-8">
       <div>
         <h1 className="text-2xl font-bold text-[#f5f5f5]">Impostazioni</h1>
-        <p className="text-[#888] text-sm mt-1">Configurazione dell'applicazione</p>
+        <p className="text-[#888] text-sm mt-1">
+          Configurazione dell'applicazione
+        </p>
       </div>
 
       {/* Team */}
@@ -40,13 +44,18 @@ export default async function SettingsPage() {
         </CardHeader>
         <CardContent className="divide-y divide-[#1f1f1f]">
           {users.map((u) => (
-            <div key={u.email} className="flex items-center justify-between py-3 first:pt-0 last:pb-0">
+            <div
+              key={u.email}
+              className="flex items-center justify-between py-3 first:pt-0 last:pb-0"
+            >
               <span className="text-sm text-[#f5f5f5]">{u.email}</span>
               <RoleBadge role={u.role} />
             </div>
           ))}
           {users.length === 0 && (
-            <p className="text-[#888] text-sm py-2">Nessun utente configurato</p>
+            <p className="text-[#888] text-sm py-2">
+              Nessun utente configurato
+            </p>
           )}
         </CardContent>
       </Card>
@@ -54,7 +63,9 @@ export default async function SettingsPage() {
       {/* Calendly */}
       <Card className="bg-[#141414] border-[#1f1f1f]">
         <CardHeader>
-          <CardTitle className="text-base text-[#f5f5f5]">Configurazione</CardTitle>
+          <CardTitle className="text-base text-[#f5f5f5]">
+            Configurazione
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
@@ -78,8 +89,13 @@ export default async function SettingsPage() {
                 <Shield size={18} className="text-[#c9a96e]" />
               </div>
               <div className="flex-1">
-                <p className="text-sm font-semibold text-[#f5f5f5]">Log Attività</p>
-                <p className="text-xs text-[#555] mt-0.5">Registro di tutte le operazioni: creazioni, modifiche, cancellazioni</p>
+                <p className="text-sm font-semibold text-[#f5f5f5]">
+                  Log Attività
+                </p>
+                <p className="text-xs text-[#555] mt-0.5">
+                  Registro di tutte le operazioni: creazioni, modifiche,
+                  cancellazioni
+                </p>
               </div>
               <ExternalLink size={14} className="text-[#444]" />
             </CardContent>
@@ -87,36 +103,38 @@ export default async function SettingsPage() {
         </Link>
       )}
 
-      {/* Notion databases */}
+      {/* Supabase Status */}
       <Card className="bg-[#141414] border-[#1f1f1f]">
         <CardHeader>
-          <CardTitle className="text-base text-[#f5f5f5]">Database Notion</CardTitle>
+          <CardTitle className="text-base text-[#f5f5f5]">
+            Database Supabase
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {[
-            { label: "Pipeline Lead", id: pipelineId },
-            { label: "Report Generati", id: reportsId },
-            { label: "Clienti Attivi", id: clientsId },
-          ].map(({ label, id }) => (
-            <div key={label}>
-              <p className="text-xs text-[#888] mb-1">{label}</p>
-              <div className="flex items-center gap-2">
-                <code className="text-xs text-[#f5f5f5] bg-[#0d0d0d] border border-[#1f1f1f] rounded px-2 py-1 flex-1 truncate">
-                  {id || "Non configurato"}
-                </code>
-                {id && (
-                  <a
-                    href={`https://notion.so/${id.replace(/-/g, "")}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[#888] hover:text-[#c9a96e] transition-colors"
-                  >
-                    <ExternalLink size={14} />
-                  </a>
-                )}
-              </div>
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-[#888]">Stato Migrazione</span>
+            <span className="text-xs font-bold text-green-400 bg-green-400/10 px-2 py-0.5 rounded border border-green-400/20">
+              Completata
+            </span>
+          </div>
+          <div>
+            <p className="text-xs text-[#888] mb-1">Project ID</p>
+            <div className="flex items-center gap-2">
+              <code className="text-xs text-[#f5f5f5] bg-[#0d0d0d] border border-[#1f1f1f] rounded px-2 py-1 flex-1 truncate">
+                {process.env.NEXT_PUBLIC_SUPABASE_URL?.split("//")[1]?.split(
+                  ".",
+                )[0] || "gwuungagtnwzbowvlrev"}
+              </code>
+              <a
+                href={`https://supabase.com/dashboard/project/${process.env.NEXT_PUBLIC_SUPABASE_URL?.split("//")[1]?.split(".")[0] || "gwuungagtnwzbowvlrev"}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#888] hover:text-[#c9a96e] transition-colors"
+              >
+                <ExternalLink size={14} />
+              </a>
             </div>
-          ))}
+          </div>
         </CardContent>
       </Card>
     </div>

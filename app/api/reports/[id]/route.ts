@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { getReport, updateReport, deleteReport, logAction } from "@/lib/notion";
+import { getReport, updateReport, deleteReport, logAction } from "@/lib/db";
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   // Public access with token
@@ -10,6 +10,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 
   try {
     const report = await getReport(params.id);
+    if (!report) return NextResponse.json({ error: "Report non trovato" }, { status: 404 });
 
     if (token) {
       if (report.token !== token) {
@@ -39,6 +40,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   try {
     const data = await req.json();
     const report = await updateReport(params.id, data);
+    if (!report) return NextResponse.json({ error: "Report non trovato" }, { status: 404 });
+
     logAction({
       azione: "Modifica",
       entita: "Report",
@@ -63,9 +66,11 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
 
   try {
     const report = await getReport(params.id);
+    if (!report) return NextResponse.json({ error: "Report non trovato" }, { status: 404 });
+
     await deleteReport(params.id);
     logAction({
-      azione: "Cancellazione",
+      azione: "Eliminazione",
       entita: "Report",
       nomeEntita: report.titolo,
       entitaId: params.id,
