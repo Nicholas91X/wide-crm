@@ -40,7 +40,7 @@ export default function BottomNav() {
               href={href}
               className={cn(
                 "flex flex-col items-center justify-center w-full h-full gap-1 transition-colors",
-                active ? "text-[#c9a96e]" : "text-[#888]",
+                active ? "text-[#c9a96e]" : "text-[#ccc]",
               )}
             >
               <span className="relative">

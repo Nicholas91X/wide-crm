@@ -32,7 +32,7 @@ export default async function SettingsPage() {
     <div className="max-w-2xl space-y-8">
       <div>
         <h1 className="text-2xl font-bold text-[#f5f5f5]">Impostazioni</h1>
-        <p className="text-[#888] text-sm mt-1">
+        <p className="text-[#ccc] text-sm mt-1">
           Configurazione dell'applicazione
         </p>
       </div>
@@ -53,8 +53,8 @@ export default async function SettingsPage() {
             </div>
           ))}
           {users.length === 0 && (
-            <p className="text-[#888] text-sm py-2">
-              Nessun utente configurato
+            <p className="text-[#ccc] text-sm py-2">
+              L&apos;integrazione con il tuo calendario.
             </p>
           )}
         </CardContent>
@@ -69,12 +69,13 @@ export default async function SettingsPage() {
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            <p className="text-xs text-[#888]">CALENDLY_URL (env)</p>
+            <p className="text-xs text-[#ccc]">CALENDLY_URL (env)</p>
             <p className="text-sm text-[#f5f5f5] bg-[#0d0d0d] border border-[#1f1f1f] rounded px-3 py-2 font-mono">
               {process.env.CALENDLY_URL ?? "Non configurato"}
             </p>
-            <p className="text-xs text-[#555]">
-              Modifica questa variabile in .env.local e riavvia il server.
+            <p className="text-xs text-[#999]">
+              Configura questa variabile in Vercel o .env.local per abilitare il
+              calendario.
             </p>
           </div>
         </CardContent>
@@ -92,12 +93,12 @@ export default async function SettingsPage() {
                 <p className="text-sm font-semibold text-[#f5f5f5]">
                   Log Attività
                 </p>
-                <p className="text-xs text-[#555] mt-0.5">
-                  Registro di tutte le operazioni: creazioni, modifiche,
-                  cancellazioni
+                <p className="text-xs text-[#999] mt-0.5">
+                  Visualizza i parametri tecnici necessari per
+                  l&apos;integrazione esterna.
                 </p>
               </div>
-              <ExternalLink size={14} className="text-[#444]" />
+              <ExternalLink size={14} className="text-[#888]" />
             </CardContent>
           </Card>
         </Link>
@@ -112,13 +113,13 @@ export default async function SettingsPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-[#888]">Stato Migrazione</span>
+            <span className="text-xs text-[#ccc]">Stato Migrazione</span>
             <span className="text-xs font-bold text-green-400 bg-green-400/10 px-2 py-0.5 rounded border border-green-400/20">
               Completata
             </span>
           </div>
           <div>
-            <p className="text-xs text-[#888] mb-1">Project ID</p>
+            <p className="text-xs text-[#ccc] mb-1">Project ID</p>
             <div className="flex items-center gap-2">
               <code className="text-xs text-[#f5f5f5] bg-[#0d0d0d] border border-[#1f1f1f] rounded px-2 py-1 flex-1 truncate">
                 {process.env.NEXT_PUBLIC_SUPABASE_URL?.split("//")[1]?.split(
@@ -129,7 +130,7 @@ export default async function SettingsPage() {
                 href={`https://supabase.com/dashboard/project/${process.env.NEXT_PUBLIC_SUPABASE_URL?.split("//")[1]?.split(".")[0] || "gwuungagtnwzbowvlrev"}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[#888] hover:text-[#c9a96e] transition-colors"
+                className="text-[#ccc] hover:text-[#c9a96e] transition-colors"
               >
                 <ExternalLink size={14} />
               </a>

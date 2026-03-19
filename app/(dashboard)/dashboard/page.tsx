@@ -126,7 +126,7 @@ export default async function DashboardPage() {
     <div className="space-y-6 max-w-6xl">
       <div>
         <h1 className="text-2xl font-bold text-[#f5f5f5]">Dashboard</h1>
-        <p className="text-[#888] text-sm mt-1">
+        <p className="text-[#ccc] text-sm mt-1">
           Panoramica della pipeline commerciale
         </p>
       </div>
@@ -139,7 +139,7 @@ export default async function DashboardPage() {
             className="glass-dark border border-white/5 rounded-xl p-4"
           >
             <div className="flex items-center justify-between mb-3">
-              <span className="text-[10px] uppercase tracking-wider text-[#555] font-bold">
+              <span className="text-[10px] uppercase tracking-wider text-[#999] font-bold">
                 {label}
               </span>
               <Icon size={14} className={color} />
@@ -149,7 +149,7 @@ export default async function DashboardPage() {
             >
               {value}
             </div>
-            <p className="text-[10px] text-[#444] mt-1">{sub}</p>
+            <p className="text-[10px] text-[#888] mt-1">{sub}</p>
           </div>
         ))}
       </div>
@@ -169,7 +169,7 @@ export default async function DashboardPage() {
             </Link>
           </div>
           {statoDistribution.length === 0 ? (
-            <p className="text-[#555] text-xs text-center py-6">Nessun lead</p>
+            <p className="text-[#999] text-xs text-center py-6">Nessun lead</p>
           ) : (
             <div className="space-y-2.5">
               {statoDistribution.map(({ stato, count }) => (
@@ -178,7 +178,7 @@ export default async function DashboardPage() {
                   href={`/pipeline?stato=${encodeURIComponent(stato)}`}
                   className="flex items-center gap-3 group"
                 >
-                  <span className="text-[10px] text-[#555] w-28 truncate group-hover:text-[#888] transition-colors flex-shrink-0">
+                  <span className="text-[10px] text-[#999] w-28 truncate group-hover:text-[#ccc] transition-colors flex-shrink-0">
                     {stato}
                   </span>
                   <div className="flex-1 bg-white/5 rounded-full h-1.5">
@@ -187,7 +187,7 @@ export default async function DashboardPage() {
                       style={{ width: `${(count / maxCount) * 100}%` }}
                     />
                   </div>
-                  <span className="text-[10px] font-bold text-[#888] w-4 text-right flex-shrink-0">
+                  <span className="text-[10px] font-bold text-[#ccc] w-4 text-right flex-shrink-0">
                     {count}
                   </span>
                 </Link>
@@ -218,7 +218,7 @@ export default async function DashboardPage() {
           {followUpsUrgent.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 gap-2">
               <CheckCircle size={20} className="text-green-500/40" />
-              <p className="text-[#444] text-xs">
+              <p className="text-[#888] text-xs">
                 Nessun follow-up in scadenza
               </p>
             </div>
@@ -242,7 +242,7 @@ export default async function DashboardPage() {
                       <p className="text-sm font-medium text-[#f5f5f5] truncate">
                         {lead.nomeAzienda}
                       </p>
-                      <p className="text-[10px] text-[#555]">
+                      <p className="text-[10px] text-[#999]">
                         {lead.settore} · {lead.stato}
                       </p>
                     </div>
@@ -277,7 +277,7 @@ export default async function DashboardPage() {
           </Link>
         </div>
         {latestLeads.length === 0 ? (
-          <p className="px-5 py-8 text-[#555] text-sm text-center">
+          <p className="px-5 py-8 text-[#999] text-sm text-center">
             Nessun lead
           </p>
         ) : (
@@ -291,7 +291,7 @@ export default async function DashboardPage() {
                       (h) => (
                         <th
                           key={h}
-                          className="text-left px-5 py-3 text-[10px] text-[#555] font-bold uppercase tracking-wider"
+                          className="text-left px-5 py-3 text-[10px] text-[#999] font-bold uppercase tracking-wider"
                         >
                           {h}
                         </th>
@@ -313,10 +313,10 @@ export default async function DashboardPage() {
                           {lead.nomeAzienda || "-"}
                         </Link>
                       </td>
-                      <td className="px-5 py-3 text-[#888] text-xs">
+                      <td className="px-5 py-3 text-[#ccc] text-xs">
                         {lead.settore || "-"}
                       </td>
-                      <td className="px-5 py-3 text-[#888] text-xs">
+                      <td className="px-5 py-3 text-[#ccc] text-xs">
                         {lead.territorio || "-"}
                       </td>
                       <td className="px-5 py-3">
@@ -342,7 +342,7 @@ export default async function DashboardPage() {
                     <p className="text-sm font-medium text-[#f5f5f5] truncate">
                       {lead.nomeAzienda}
                     </p>
-                    <p className="text-[10px] text-[#555]">{lead.settore}</p>
+                    <p className="text-[10px] text-[#999]">{lead.settore}</p>
                   </div>
                   <div className="flex flex-col items-end gap-1">
                     <StatoBadge stato={lead.stato} />

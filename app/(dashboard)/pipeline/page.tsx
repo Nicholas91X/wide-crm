@@ -227,7 +227,7 @@ export default function PipelinePage() {
           <h1 className="text-2xl font-bold text-[#f5f5f5] tracking-tight">
             Pipeline
           </h1>
-          <p className="text-[#555] text-xs mt-1 uppercase tracking-widest">
+          <p className="text-[#999] text-xs mt-1 uppercase tracking-widest">
             {leads.length} lead totali
           </p>
         </div>
@@ -255,7 +255,7 @@ export default function PipelinePage() {
                 "h-8 gap-2",
                 view === "kanban"
                   ? "bg-[#c9a96e]/10 text-[#c9a96e]"
-                  : "text-[#888]",
+                  : "text-[#ccc]",
               )}
             >
               <Columns size={16} />
@@ -268,7 +268,7 @@ export default function PipelinePage() {
               variant="outline"
               onClick={() => exportLeadsCSV(leads)}
               disabled={leads.length === 0}
-              className="border-white/10 text-[#888] hover:text-[#f5f5f5] font-bold h-8 text-xs"
+              className="border-white/10 text-[#ccc] hover:text-[#f5f5f5] font-bold h-8 text-xs"
             >
               <Download size={14} className="mr-1" /> CSV
             </Button>
@@ -298,8 +298,8 @@ export default function PipelinePage() {
       {/* Filters */}
       <div className="grid grid-cols-2 md:flex md:flex-wrap gap-2 md:gap-3 items-center">
         <div className="flex items-center gap-2 col-span-2 md:col-auto mb-1 md:mb-0">
-          <Filter size={14} className="text-[#555]" />
-          <span className="text-[10px] uppercase text-[#555] font-bold tracking-widest hidden md:inline">
+          <Filter size={14} className="text-[#999]" />
+          <span className="text-[10px] uppercase text-[#999] font-bold tracking-widest hidden md:inline">
             Filtri
           </span>
         </div>
@@ -403,7 +403,7 @@ function TableView({
 
   if (leads.length === 0) {
     return (
-      <div className="text-center py-20 text-[#888]">Nessun lead trovato</div>
+      <div className="text-center py-20 text-[#ccc]">Nessun lead trovato</div>
     );
   }
 
@@ -427,7 +427,7 @@ function TableView({
               ].map((h) => (
                 <th
                   key={h}
-                  className="text-left px-4 py-4 text-[10px] text-[#555] font-bold uppercase tracking-wider whitespace-nowrap"
+                  className="text-left px-4 py-4 text-[10px] text-[#999] font-bold uppercase tracking-wider whitespace-nowrap"
                 >
                   {h}
                 </th>
@@ -448,10 +448,10 @@ function TableView({
                     {lead.nomeAzienda || "-"}
                   </Link>
                 </td>
-                <td className="px-4 py-4 text-[#888] text-xs">
+                <td className="px-4 py-4 text-[#ccc] text-xs">
                   {lead.settore || "-"}
                 </td>
-                <td className="px-4 py-4 text-[#888] text-xs">
+                <td className="px-4 py-4 text-[#ccc] text-xs">
                   {lead.territorio || "-"}
                 </td>
                 <td className="px-4 py-4 text-xs font-bold text-[#c9a96e]">
@@ -468,7 +468,7 @@ function TableView({
                         }
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#555] hover:text-[#c9a96e] transition-colors"
+                        className="text-[#999] hover:text-[#c9a96e] transition-colors"
                       >
                         <Instagram size={14} />
                       </a>
@@ -482,7 +482,7 @@ function TableView({
                         }
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#555] hover:text-[#c9a96e] transition-colors"
+                        className="text-[#999] hover:text-[#c9a96e] transition-colors"
                       >
                         <Facebook size={14} />
                       </a>
@@ -496,14 +496,14 @@ function TableView({
                         }
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#555] hover:text-[#c9a96e] transition-colors"
+                        className="text-[#999] hover:text-[#c9a96e] transition-colors"
                       >
                         <Linkedin size={14} />
                       </a>
                     )}
                   </div>
                 </td>
-                <td className="px-4 py-4 text-[#555]">
+                <td className="px-4 py-4 text-[#999]">
                   {lead.sitoWeb && (
                     <a
                       href={
@@ -523,7 +523,7 @@ function TableView({
                 <td className="px-4 py-4">
                   <StatoBadge stato={lead.stato} />
                 </td>
-                <td className="px-4 py-4 text-[#555] text-xs whitespace-nowrap">
+                <td className="px-4 py-4 text-[#999] text-xs whitespace-nowrap">
                   {formatDate(lead.dataPrimoContatto)}
                 </td>
                 <td className="px-4 py-4 text-red-400/80 text-xs whitespace-nowrap font-medium">
@@ -535,7 +535,7 @@ function TableView({
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 text-[#555] hover:text-[#f5f5f5]"
+                        className="h-8 w-8 text-[#999] hover:text-[#f5f5f5]"
                       >
                         <MoreHorizontal size={14} />
                       </Button>
@@ -596,7 +596,7 @@ function TableView({
                   <h3 className="font-bold text-[#f5f5f5] text-sm truncate pr-2">
                     {lead.nomeAzienda}
                   </h3>
-                  <p className="text-[10px] text-[#555] uppercase tracking-wider">
+                  <p className="text-[10px] text-[#999] uppercase tracking-wider">
                     {lead.settore} · {lead.territorio}
                   </p>
                 </div>
@@ -607,7 +607,7 @@ function TableView({
                   </span>
                 </div>
               </div>
-              <div className="flex items-center gap-4 text-[10px] text-[#555] font-medium">
+              <div className="flex items-center gap-4 text-[10px] text-[#999] font-medium">
                 <div>
                   <span className="opacity-50">Contatto:</span>{" "}
                   {formatDate(lead.dataPrimoContatto)}
@@ -628,7 +628,7 @@ function TableView({
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 text-[#555]"
+                    className="h-8 w-8 text-[#999]"
                   >
                     <MoreHorizontal size={14} />
                   </Button>
@@ -725,10 +725,10 @@ function KanbanColumn({
   return (
     <div className="w-56 flex-shrink-0 flex flex-col">
       <div className="flex items-center justify-between mb-2 px-1">
-        <h3 className="text-[10px] font-bold text-[#555] uppercase tracking-wider truncate pr-2">
+        <h3 className="text-[10px] font-bold text-[#999] uppercase tracking-wider truncate pr-2">
           {col}
         </h3>
-        <span className="text-[10px] bg-[#1a1a1a] text-[#555] rounded-full px-2 py-0.5 flex-shrink-0">
+        <span className="text-[10px] bg-[#1a1a1a] text-[#999] rounded-full px-2 py-0.5 flex-shrink-0">
           {leads.length}
         </span>
       </div>
@@ -746,7 +746,7 @@ function KanbanColumn({
         ))}
         {leads.length === 0 && (
           <div className="flex items-center justify-center h-16 border border-dashed border-white/5 rounded-lg">
-            <span className="text-[10px] text-[#333]">Vuoto</span>
+            <span className="text-[10px] text-[#777]">Vuoto</span>
           </div>
         )}
       </div>
@@ -780,7 +780,7 @@ function KanbanCard({ lead, canDrag }: { lead: Lead; canDrag: boolean }) {
         <button
           {...listeners}
           {...attributes}
-          className="absolute top-2 right-2 text-[#333] hover:text-[#555] cursor-grab active:cursor-grabbing touch-none"
+          className="absolute top-2 right-2 text-[#777] hover:text-[#999] cursor-grab active:cursor-grabbing touch-none"
           onClick={(e) => e.stopPropagation()}
         >
           <GripVertical size={12} />
@@ -794,7 +794,7 @@ function KanbanCard({ lead, canDrag }: { lead: Lead; canDrag: boolean }) {
           {lead.nomeAzienda}
         </p>
         {lead.settore && (
-          <p className="text-[10px] text-[#555] mt-0.5 truncate">
+          <p className="text-[10px] text-[#999] mt-0.5 truncate">
             {lead.settore}
           </p>
         )}

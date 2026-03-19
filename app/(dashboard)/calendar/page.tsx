@@ -231,7 +231,7 @@ export default function CalendarPage() {
           <h1 className="text-2xl md:text-3xl font-bold text-[#f5f5f5] capitalize">
             {format(currentMonth, "MMMM yyyy", { locale: it })}
           </h1>
-          <p className="text-[#888] text-xs md:text-sm mt-1">
+          <p className="text-[#ccc] text-xs md:text-sm mt-1">
             Gestisci i tuoi appuntamenti e follow-up
           </p>
         </div>
@@ -241,7 +241,7 @@ export default function CalendarPage() {
               variant="ghost"
               size="icon"
               onClick={handlePrevMonth}
-              className="h-8 w-8 text-[#888]"
+              className="h-8 w-8 text-[#ccc]"
             >
               <ChevronLeft size={18} />
             </Button>
@@ -257,7 +257,7 @@ export default function CalendarPage() {
               variant="ghost"
               size="icon"
               onClick={handleNextMonth}
-              className="h-8 w-8 text-[#888]"
+              className="h-8 w-8 text-[#ccc]"
             >
               <ChevronRight size={18} />
             </Button>
@@ -272,7 +272,7 @@ export default function CalendarPage() {
                 "h-8 w-8",
                 viewMode === "agenda"
                   ? "bg-white/10 text-white"
-                  : "text-[#888]",
+                  : "text-[#ccc]",
               )}
             >
               <List size={18} />
@@ -283,7 +283,7 @@ export default function CalendarPage() {
               onClick={() => setViewMode("month")}
               className={cn(
                 "h-8 w-8",
-                viewMode === "month" ? "bg-white/10 text-white" : "text-[#888]",
+                viewMode === "month" ? "bg-white/10 text-white" : "text-[#ccc]",
               )}
             >
               <CalendarGrid size={18} />
@@ -310,7 +310,7 @@ export default function CalendarPage() {
         {days.map((d) => (
           <div
             key={d}
-            className="text-center text-[10px] font-bold uppercase tracking-wider text-[#666] py-2"
+            className="text-center text-[10px] font-bold uppercase tracking-wider text-[#aaa] py-2"
           >
             {d}
           </div>
@@ -345,7 +345,7 @@ export default function CalendarPage() {
           onClick={() => onDateClick(cloneDay)}
         >
           <div className="flex flex-col items-center justify-start min-w-[40px]">
-            <span className="text-[10px] uppercase font-bold text-[#666]">
+            <span className="text-[10px] uppercase font-bold text-[#aaa]">
               {format(day, "EEE", { locale: it })}
             </span>
             <span
@@ -393,7 +393,7 @@ export default function CalendarPage() {
                 );
               })
             ) : (
-              <div className="h-full flex items-center italic text-[#444] text-xs">
+              <div className="h-full flex items-center italic text-[#888] text-xs">
                 Nessun evento
               </div>
             )}
@@ -446,12 +446,12 @@ export default function CalendarPage() {
               <span
                 className={cn(
                   "text-xs font-medium w-6 h-6 flex items-center justify-center rounded-full transition-colors",
-                  isToday(day) ? "bg-[#c9a96e] text-black" : "text-[#888]",
+                  isToday(day) ? "bg-[#c9a96e] text-black" : "text-[#ccc]",
                 )}
               >
                 {formattedDate}
               </span>
-              <button className="opacity-0 group-hover:opacity-100 p-1 text-[#666] hover:text-[#f5f5f5] transition-opacity">
+              <button className="opacity-0 group-hover:opacity-100 p-1 text-[#aaa] hover:text-[#f5f5f5] transition-opacity">
                 <Plus size={14} />
               </button>
             </div>
@@ -513,7 +513,7 @@ export default function CalendarPage() {
             <div className="min-h-[400px] md:min-h-[600px] flex items-center justify-center border border-white/5 rounded-xl bg-[#141414]/20">
               <div className="flex flex-col items-center gap-4">
                 <div className="h-8 w-8 border-2 border-[#c9a96e] border-t-transparent rounded-full animate-spin" />
-                <p className="text-[#888] text-sm">Caricamento calendario...</p>
+                <p className="text-[#ccc] text-sm">Caricamento calendario...</p>
               </div>
             </div>
           ) : viewMode === "month" ? (
@@ -562,7 +562,7 @@ export default function CalendarPage() {
                             {e.tipo}
                           </Badge>
                         </div>
-                        <div className="flex items-center gap-2 text-[10px] text-[#888]">
+                        <div className="flex items-center gap-2 text-[10px] text-[#ccc]">
                           <CalendarIcon size={10} />
                           {format(parseISO(e.inizio), "d MMM, HH:mm", {
                             locale: it,
@@ -573,7 +573,7 @@ export default function CalendarPage() {
                   })}
                 {visibleEvents.length === 0 && (
                   <div className="text-center py-8">
-                    <p className="text-xs text-[#666]">
+                    <p className="text-xs text-[#aaa]">
                       Nessun evento in programma
                     </p>
                   </div>
@@ -610,7 +610,7 @@ export default function CalendarPage() {
             <DialogTitle className="text-xl font-bold flex items-center gap-2">
               {selectedEvent ? "Modifica Evento" : "Nuovo Evento"}
             </DialogTitle>
-            <DialogDescription className="text-[#888]">
+            <DialogDescription className="text-[#ccc]">
               {selectedEvent
                 ? "Modifica i dettagli dell'appuntamento esistente."
                 : "Aggiungi un nuovo appuntamento al tuo calendario."}
@@ -619,7 +619,7 @@ export default function CalendarPage() {
 
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="titolo" className="text-xs text-[#888]">
+              <Label htmlFor="titolo" className="text-xs text-[#ccc]">
                 Titolo
               </Label>
               <Input
@@ -635,7 +635,7 @@ export default function CalendarPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="inizio" className="text-xs text-[#888]">
+                <Label htmlFor="inizio" className="text-xs text-[#ccc]">
                   Inizio
                 </Label>
                 <div className="relative">
@@ -655,7 +655,7 @@ export default function CalendarPage() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="fine" className="text-xs text-[#888]">
+                <Label htmlFor="fine" className="text-xs text-[#ccc]">
                   Fine (Opzionale)
                 </Label>
                 <div className="relative">
@@ -678,7 +678,7 @@ export default function CalendarPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="tipo" className="text-xs text-[#888]">
+                <Label htmlFor="tipo" className="text-xs text-[#ccc]">
                   Tipo
                 </Label>
                 <Select
@@ -700,7 +700,7 @@ export default function CalendarPage() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="membro" className="text-xs text-[#888]">
+                <Label htmlFor="membro" className="text-xs text-[#ccc]">
                   Assegnato a
                 </Label>
                 <div className="relative">
@@ -714,7 +714,7 @@ export default function CalendarPage() {
                     className="bg-white/5 border-white/10 focus:border-[#c9a96e]/50 pl-9 opacity-70"
                   />
                   <User
-                    className="absolute left-3 top-2.5 text-[#666]"
+                    className="absolute left-3 top-2.5 text-[#aaa]"
                     size={14}
                   />
                 </div>
@@ -722,7 +722,7 @@ export default function CalendarPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="note" className="text-xs text-[#888]">
+              <Label htmlFor="note" className="text-xs text-[#ccc]">
                 Note
               </Label>
               <Textarea
@@ -755,7 +755,7 @@ export default function CalendarPage() {
               <Button
                 variant="ghost"
                 onClick={() => setIsDialogOpen(false)}
-                className="text-[#888] hover:text-[#f5f5f5]"
+                className="text-[#ccc] hover:text-[#f5f5f5]"
               >
                 Annulla
               </Button>

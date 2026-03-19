@@ -52,7 +52,7 @@ export default function Sidebar() {
           <span className="text-2xl font-bold tracking-widest text-[#c9a96e]">
             WIDE
           </span>
-          <span className="text-xs text-[#888] ml-1 tracking-wider">CRM</span>
+          <span className="text-xs text-[#ccc] ml-1 tracking-wider">CRM</span>
         </div>
         <SearchModal />
       </div>
@@ -74,7 +74,7 @@ export default function Sidebar() {
                   "flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors",
                   active || subActive
                     ? "bg-[#c9a96e]/10 text-[#c9a96e]"
-                    : "text-[#888] hover:text-[#f5f5f5] hover:bg-[#141414]",
+                    : "text-[#ccc] hover:text-[#f5f5f5] hover:bg-[#141414]",
                 )}
               >
                 <span className="relative">
@@ -99,7 +99,7 @@ export default function Sidebar() {
                           "flex items-center gap-2 px-3 py-2 rounded-md text-xs font-medium transition-colors",
                           subIsActive
                             ? "text-[#c9a96e] bg-[#c9a96e]/5"
-                            : "text-[#666] hover:text-[#f5f5f5] hover:bg-[#141414]",
+                            : "text-[#aaa] hover:text-[#f5f5f5] hover:bg-[#141414]",
                         )}
                       >
                         <s.icon size={13} />
@@ -146,13 +146,13 @@ export default function Sidebar() {
             <p className="text-xs font-medium text-[#f5f5f5] truncate">
               {session?.user?.name ?? "Utente"}
             </p>
-            <p className="text-[10px] text-[#888] capitalize">
+            <p className="text-[10px] text-[#ccc] capitalize">
               {role ?? "viewer"}
             </p>
           </div>
           <button
             onClick={() => signOut({ callbackUrl: "/login" })}
-            className="text-[#888] hover:text-[#f5f5f5] transition-colors p-1"
+            className="text-[#ccc] hover:text-[#f5f5f5] transition-colors p-1"
             title="Logout"
           >
             <LogOut size={16} />

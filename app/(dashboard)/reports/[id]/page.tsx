@@ -5,6 +5,8 @@ import { useParams, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
+import { format, parseISO } from "date-fns";
+import { it } from "date-fns/locale";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -15,7 +17,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Copy, ArrowLeft, ExternalLink, Trash2, Loader2, RefreshCw } from "lucide-react";
+import {
+  Copy,
+  ArrowLeft,
+  ExternalLink,
+  Trash2,
+  Loader2,
+  RefreshCw,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Report, STATI_REPORT, ESITI_REPORT } from "@/lib/types";
 
@@ -95,7 +104,10 @@ export default function ReportDetailPage() {
 
   function openPublicLink() {
     if (!report) return;
-    window.open(`${window.location.origin}/r/${id}?token=${report.token}`, "_blank");
+    window.open(
+      `${window.location.origin}/r/${id}?token=${report.token}`,
+      "_blank",
+    );
   }
 
   async function handleDelete() {
@@ -137,13 +149,19 @@ export default function ReportDetailPage() {
         if (done) break;
         const chunk = decoder.decode(value, { stream: true });
         for (const line of chunk.split("\n")) {
-          if (line.startsWith("__REPORT_ID__:") || line.startsWith("__ERROR__:")) continue;
+          if (
+            line.startsWith("__REPORT_ID__:") ||
+            line.startsWith("__ERROR__:")
+          )
+            continue;
           full += line + "\n";
-          setRegenContent(prev => prev + line + "\n");
+          setRegenContent((prev) => prev + line + "\n");
         }
       }
       setRegenDone(true);
-      toast.success("Report rigenerato — ricarica la pagina per vederlo aggiornato");
+      toast.success(
+        "Report rigenerato — ricarica la pagina per vederlo aggiornato",
+      );
     } catch (err: any) {
       toast.error(err.message || "Errore nella rigenerazione");
     } finally {
@@ -164,7 +182,7 @@ export default function ReportDetailPage() {
       <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
         <div className="text-center space-y-4">
           <h1 className="text-2xl font-bold text-[#f5f5f5]">Link non valido</h1>
-          <p className="text-[#888]">Questo link è scaduto o non è valido.</p>
+          <p className="text-[#ccc]">Questo link è scaduto o non è valido.</p>
         </div>
       </div>
     );
@@ -172,7 +190,9 @@ export default function ReportDetailPage() {
 
   if (!report) {
     return (
-      <div className="text-[#888] text-center py-20">Report non trovato</div>
+      <div className="flex-1 flex flex-col pt-16 md:pt-0">
+        <div className="text-[#ccc] text-center py-20">Report non trovato</div>
+      </div>
     );
   }
 
@@ -189,32 +209,32 @@ export default function ReportDetailPage() {
           variant="ghost"
           size="icon"
           onClick={() => router.push("/reports")}
-          className="text-[#555] hover:text-[#f5f5f5] bg-white/5 rounded-full"
+          className="text-[#999] hover:text-[#f5f5f5] bg-white/5 rounded-full"
         >
           <ArrowLeft size={16} />
         </Button>
-        <div className="min-w-0 flex-1">
-          <h1 className="text-xl font-bold text-[#f5f5f5] truncate tracking-tight">
+        <div>
+          <p className="text-[#999] text-[10px] md:text-xs uppercase tracking-widest">
+            Analisi Lead CRM
+          </p>
+          <h1 className="text-2xl md:text-3xl font-bold text-[#f5f5f5]">
             {report.titolo}
           </h1>
-          <p className="text-[#555] text-[10px] md:text-xs uppercase tracking-widest">
-            {report.azienda} · {formatDate(report.dataGenerazione)}
-          </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Sidebar - Shows first on mobile for quick actions */}
         <div className="order-1 lg:order-2 space-y-4">
-          <Card className="glass-dark border-white/5">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-[#555]">
+          <Card className="bg-[#141414] border-white/5 overflow-hidden">
+            <CardHeader className="border-b border-white/5 bg-[#1a1a1a]/30">
+              <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-[#999]">
                 Stato e Azioni
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-1">
-                <Label className="text-[10px] uppercase text-[#555] font-bold tracking-tight">
+                <Label className="text-[10px] uppercase text-[#999] font-bold tracking-tight">
                   Stato Invio
                 </Label>
                 <Select
@@ -236,7 +256,7 @@ export default function ReportDetailPage() {
               </div>
 
               <div className="space-y-1">
-                <Label className="text-[10px] uppercase text-[#555] font-bold tracking-tight">
+                <Label className="text-[10px] uppercase text-[#999] font-bold tracking-tight">
                   Esito Business
                 </Label>
                 <Select
@@ -259,8 +279,10 @@ export default function ReportDetailPage() {
 
               {report.generatoDa && (
                 <div className="pt-1 flex items-center justify-between text-xs">
-                  <span className="text-[#555] uppercase tracking-wider font-bold text-[10px]">Generato da</span>
-                  <span className="text-[#888]">{report.generatoDa}</span>
+                  <span className="text-[#999] uppercase tracking-wider font-bold text-[10px]">
+                    Generato da
+                  </span>
+                  <span className="text-[#ccc]">{report.generatoDa}</span>
                 </div>
               )}
 
@@ -284,7 +306,7 @@ export default function ReportDetailPage() {
                 {report.leadId && (
                   <Button
                     variant="outline"
-                    className="w-full border-white/10 text-[#888] hover:text-[#f5f5f5] text-xs h-10 font-medium"
+                    className="w-full border-white/10 text-[#ccc] hover:text-[#f5f5f5] text-xs h-10 font-medium"
                     onClick={() => router.push(`/pipeline/${report.leadId}`)}
                   >
                     <ExternalLink size={14} className="mr-2" /> Vai al Lead
@@ -315,7 +337,7 @@ export default function ReportDetailPage() {
         </div>
 
         {/* Report content */}
-        <div className="order-2 lg:order-1 lg:col-span-3">
+        <div className="order-2 lg:order-1 lg:col-span-2">
           <Card className="glass-dark border-white/5">
             <CardContent className="p-4 md:p-8">
               <div className="prose-report max-w-none">
@@ -330,25 +352,47 @@ export default function ReportDetailPage() {
 
       {/* Regen modal */}
       {showRegenModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4" onClick={() => { if (!regenerating) setShowRegenModal(false); }}>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center px-4"
+          onClick={() => {
+            if (!regenerating) setShowRegenModal(false);
+          }}
+        >
           <div className="absolute inset-0 bg-black/60" />
-          <div className="relative w-full max-w-2xl bg-[#141414] border border-[#1f1f1f] rounded-xl p-6 space-y-4 max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-            <h3 className="text-base font-bold text-[#f5f5f5]">Rigenera Report — {report.azienda}</h3>
+          <div
+            className="relative w-full max-w-2xl bg-[#141414] border border-[#1f1f1f] rounded-xl p-6 space-y-4 max-h-[80vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-base font-bold text-[#f5f5f5]">
+              Rigenera Report — {report.azienda}
+            </h3>
             {!regenerating && !regenDone && (
               <div className="space-y-4">
                 <div className="space-y-1">
-                  <label className="text-[10px] uppercase text-[#555] font-bold tracking-tight">Info aggiuntive (opzionale)</label>
+                  <label className="text-[10px] uppercase text-[#999] font-bold tracking-tight">
+                    Info aggiuntive (opzionale)
+                  </label>
                   <textarea
                     value={regenInfo}
-                    onChange={e => setRegenInfo(e.target.value)}
+                    onChange={(e) => setRegenInfo(e.target.value)}
                     placeholder="Aggiornamenti, nuove info sull'azienda..."
                     rows={3}
                     className="w-full bg-[#0d0d0d] border border-[#1f1f1f] text-[#f5f5f5] text-sm rounded-md px-3 py-2 resize-none outline-none focus:border-[#c9a96e]/30"
                   />
                 </div>
                 <div className="flex gap-3">
-                  <button onClick={() => setShowRegenModal(false)} className="px-4 py-2 rounded-md border border-[#1f1f1f] text-[#888] text-sm hover:text-[#f5f5f5]">Annulla</button>
-                  <button onClick={regenerateReport} className="flex-1 bg-[#c9a96e] hover:bg-[#b8945a] text-[#0a0a0a] font-bold px-4 py-2 rounded-md text-sm">Avvia Rigenerazione</button>
+                  <button
+                    onClick={() => setShowRegenModal(false)}
+                    className="px-4 py-2 rounded-md border border-[#1f1f1f] text-[#ccc] text-sm hover:text-[#f5f5f5]"
+                  >
+                    Annulla
+                  </button>
+                  <button
+                    onClick={regenerateReport}
+                    className="flex-1 bg-[#c9a96e] hover:bg-[#b8945a] text-[#0a0a0a] font-bold px-4 py-2 rounded-md text-sm"
+                  >
+                    Avvia Rigenerazione
+                  </button>
                 </div>
               </div>
             )}
@@ -362,11 +406,21 @@ export default function ReportDetailPage() {
                 )}
                 <div className="bg-[#0d0d0d] border border-[#1f1f1f] rounded-lg p-4 max-h-72 overflow-y-auto text-sm">
                   <ReactMarkdown>{regenContent}</ReactMarkdown>
-                  {regenerating && <span className="inline-block w-2 h-4 bg-[#c9a96e] animate-pulse ml-1" />}
+                  {regenerating && (
+                    <span className="inline-block w-2 h-4 bg-[#c9a96e] animate-pulse ml-1" />
+                  )}
                 </div>
                 {regenDone && (
                   <div className="flex gap-3">
-                    <button onClick={() => { setShowRegenModal(false); window.location.reload(); }} className="flex-1 bg-[#c9a96e] hover:bg-[#b8945a] text-[#0a0a0a] font-bold px-4 py-2 rounded-md text-sm">Chiudi e aggiorna</button>
+                    <button
+                      onClick={() => {
+                        setShowRegenModal(false);
+                        window.location.reload();
+                      }}
+                      className="flex-1 bg-[#c9a96e] hover:bg-[#b8945a] text-[#0a0a0a] font-bold px-4 py-2 rounded-md text-sm"
+                    >
+                      Chiudi e aggiorna
+                    </button>
                   </div>
                 )}
               </div>
@@ -390,8 +444,10 @@ function PublicReportView({ report }: { report: Report }) {
             <span className="text-2xl font-bold tracking-widest text-[#c9a96e]">
               WIDE
             </span>
-            <span className="text-xs text-[#888] ml-1 tracking-wider">
-              DIGITAL AGENCY
+            <span className="text-xs text-[#ccc] ml-1 tracking-wider">
+              {format(parseISO(report.createdTime), "d MMMM yyyy", {
+                locale: it,
+              })}
             </span>
           </div>
           <div className="text-right">

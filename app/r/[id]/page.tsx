@@ -210,7 +210,7 @@ const mdLight: Record<string, React.FC<any>> = {
 
 const mdDark: Record<string, React.FC<any>> = {
   p: ({ children }) => (
-    <p className="text-[#c9bfa8] leading-relaxed mb-4 text-[16px] italic">
+    <p className="text-[#f3f4f6] leading-relaxed mb-4 text-[16px] italic">
       {children}
     </p>
   ),
@@ -219,7 +219,7 @@ const mdDark: Record<string, React.FC<any>> = {
   ),
   ul: ({ children }) => <ul className="space-y-3 mb-4">{children}</ul>,
   li: ({ children }) => (
-    <li className="text-[#c9bfa8] text-[15px] flex gap-3 items-start">
+    <li className="text-[#f3f4f6] text-[15px] flex gap-3 items-start">
       <span className="text-[#c9a96e] mt-2 flex-shrink-0 text-[10px] leading-none">
         ▶
       </span>
@@ -247,7 +247,7 @@ function SectionHeader({
         <span className="text-xs font-bold text-[#c9a96e] tracking-widest">
           {String(num).padStart(2, "0")}
         </span>
-        <span className="text-xs text-[#9ca3af] tracking-wide">
+        <span className="text-xs text-[#4b5563] tracking-wide">
           · {subtitle}
         </span>
       </div>
@@ -279,7 +279,7 @@ function ScoreDisplay({ rating }: { rating: string }) {
         <p className="text-lg font-black" style={{ color: cfg.color }}>
           {cfg.label}
         </p>
-        <p className="text-xs text-[#9ca3af] mt-0.5 max-w-[140px] text-center leading-snug">
+        <p className="text-xs text-[#4b5563] mt-0.5 max-w-[140px] text-center leading-snug">
           {cfg.subtitle}
         </p>
       </div>
@@ -290,7 +290,7 @@ function ScoreDisplay({ rating }: { rating: string }) {
 function ImpactBadge({ label, value }: { label: string; value: string }) {
   const upper = value.toUpperCase();
   const cfg = IMPACT_CONFIG[upper] ?? {
-    color: "#6b7280",
+    color: "#4b5563",
     bg: "#f9fafb",
     border: "#e5e7eb",
   };
@@ -368,7 +368,7 @@ function SummaryCard({
           >
             {cfg.label}
           </h3>
-          <p className="text-[10px] text-[#9ca3af] uppercase tracking-[0.2em] font-bold">
+          <p className="text-[10px] text-[#4b5563] uppercase tracking-[0.2em] font-bold">
             {cfg.subtitle}
           </p>
         </div>
@@ -394,8 +394,8 @@ function SummaryCard({
             ))}
           </div>
           <div className="mt-8 pt-8 border-t border-[#f0ece3]">
-            <p className="text-[15px] text-[#6b7280] leading-relaxed italic relative pl-6">
-              <span className="absolute left-0 top-0 text-3xl text-[#c9a96e]/20 font-serif">
+            <p className="text-[15px] text-[#4b5563] leading-relaxed italic relative pl-6">
+              <span className="absolute left-0 top-0 text-3xl text-[#c9a96e]/30 font-serif">
                 "
               </span>
               L'analisi ha rilevato {criticalities.length} criticità principali.
@@ -792,7 +792,7 @@ export default function PublicReportPage() {
                 key={s.num}
                 href={`#section-${s.num}`}
                 onClick={() => i < 4 && setShowDetails(true)}
-                className="flex-shrink-0 flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-[#6b7280] hover:text-[#c9a96e] hover:bg-[#fef9ec] transition-colors"
+                className="flex-shrink-0 flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-[#374151] hover:text-[#c9a96e] hover:bg-[#fef9ec] transition-colors"
               >
                 <span>{SECTION_ICONS[i]}</span>
                 <span className="hidden sm:inline">
