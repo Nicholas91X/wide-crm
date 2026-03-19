@@ -12,7 +12,7 @@ export async function PATCH(
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const userEmail = session.user?.email;
-  const role = (session.user as any).role || getRoleFromEmail(userEmail || "");
+  const role = (session.user as { role?: string }).role || getRoleFromEmail(userEmail || "");
 
   try {
     const existingEvent = await getEvent(params.id);
@@ -34,20 +34,21 @@ export async function PATCH(
     }).catch(() => {});
 
     return NextResponse.json(event);
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err) {
+    const error = err as Error;
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
 export async function DELETE(
-  req: NextRequest,
+  _req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const userEmail = session.user?.email;
-  const role = (session.user as any).role || getRoleFromEmail(userEmail || "");
+  const role = (session.user as { role?: string }).role || getRoleFromEmail(userEmail || "");
 
   try {
     const existingEvent = await getEvent(params.id);
@@ -68,7 +69,8 @@ export async function DELETE(
     }).catch(() => {});
 
     return NextResponse.json({ success: true });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err) {
+    const error = err as Error;
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

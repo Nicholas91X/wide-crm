@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
   if (!session)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const role = (session.user as any)?.role;
+  const role = (session.user as { role?: string })?.role;
   if (role !== "admin" && role !== "editor") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
@@ -151,10 +151,10 @@ ISTRUZIONI CRITICHE PER IL REPORT:
           system: systemPrompt,
           tools: [
             {
-              type: "web_search_20250305" as any,
+              type: "web_search_20250305" as const,
               name: "web_search",
               max_uses: 5,
-            } as any,
+            },
           ],
           messages: [{ role: "user", content: userPrompt }],
         });
@@ -193,7 +193,7 @@ ISTRUZIONI CRITICHE PER IL REPORT:
         }).catch(() => {});
 
         logAction({
-          azione: "Generazione Report" as any,
+          azione: "Generazione Report",
           entita: "Report",
           nomeEntita: `${companyName} — Analisi Digitale`,
           entitaId: report.id,
@@ -203,8 +203,9 @@ ISTRUZIONI CRITICHE PER IL REPORT:
         // Send report ID to client
         controller.enqueue(encoder.encode(`\n__REPORT_ID__:${report.id}`));
         controller.close();
-      } catch (err: any) {
-        controller.enqueue(encoder.encode(`\n__ERROR__:${err.message}`));
+      } catch (err) {
+        const error = err as Error;
+        controller.enqueue(encoder.encode(`\n__ERROR__:${error.message}`));
         controller.close();
       }
     },

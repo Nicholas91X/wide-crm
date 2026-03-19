@@ -131,7 +131,7 @@ const KANBAN_COLS = [
 export default function PipelinePage() {
   const { data: session } = useSession();
   const router = useRouter();
-  const role = (session?.user as any)?.role;
+  const role = (session?.user as { role?: string })?.role;
   const canEdit = role === "admin" || role === "editor";
 
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -167,6 +167,7 @@ export default function PipelinePage() {
 
   useEffect(() => {
     loadLeads();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
 
   async function markAcquired(id: string) {
@@ -699,17 +700,6 @@ function KanbanView({
     </DndContext>
   );
 }
-
-const KANBAN_COL_ACCENT: Record<string, string> = {
-  "Da contattare": "border-gray-700",
-  Contattato: "border-blue-800/50",
-  "Report in lavorazione": "border-yellow-800/50",
-  "Report completato": "border-cyan-800/50",
-  "Report inviato": "border-purple-800/50",
-  "Follow-up": "border-orange-800/50",
-  Acquisito: "border-green-800/50",
-  "Non interessato": "border-red-900/50",
-};
 
 function KanbanColumn({
   col,

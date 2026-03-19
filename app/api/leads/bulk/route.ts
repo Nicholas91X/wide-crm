@@ -3,11 +3,19 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { createLeads, getLeads, logAction } from "@/lib/db";
 
+interface LeadResult {
+  status: "created" | "duplicate" | "error";
+  id?: string;
+  reason?: string;
+  nomeAzienda?: string;
+  [key: string]: unknown;
+}
+
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const role = (session.user as any)?.role;
+  const role = (session.user as { role?: string })?.role;
   if (role !== "admin" && role !== "editor") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
@@ -25,11 +33,11 @@ export async function POST(req: NextRequest) {
   const existingUrls = new Set(
     existingLeads
       .filter((l) => l.sitoWeb)
-      .map((l) => l.sitoWeb.toLowerCase().trim().replace(/\/$/, ""))
+      .map((l) => (l.sitoWeb as string).toLowerCase().trim().replace(/\/$/, ""))
   );
 
-  const leadsToCreate: any[] = [];
-  const results: any[] = [];
+  const leadsToCreate: Record<string, unknown>[] = [];
+  const results: LeadResult[] = [];
 
   for (const lead of leads) {
     const name = lead.nomeAzienda?.toLowerCase().trim();
@@ -54,24 +62,25 @@ export async function POST(req: NextRequest) {
   if (leadsToCreate.length > 0) {
     try {
       const createdLeads = await createLeads(leadsToCreate);
-      createdLeads.forEach((l: any, i: number) => {
+      createdLeads.forEach((l: { id: string }, i: number) => {
         results.push({ ...leadsToCreate[i], status: "created", id: l.id });
       });
-    } catch (err: any) {
+    } catch (err) {
+      const error = err as Error;
       leadsToCreate.forEach((l) => {
-        results.push({ ...l, status: "error", reason: err.message });
+        results.push({ ...l, status: "error", reason: error.message });
       });
     }
   }
 
-  const numCreated = results.filter((r: any) => r.status === "created").length;
+  const numCreated = results.filter((r) => r.status === "created").length;
   if (numCreated > 0) {
     logAction({
       azione: "Creazione",
       entita: "Lead",
       nomeEntita: `${numCreated} lead aggiunti via AI Discovery`,
       eseguitaDa: session.user?.email ?? "unknown",
-      dettagli: results.filter((r: any) => r.status === "created").map((r: any) => r.nomeAzienda).join(", "),
+      dettagli: results.filter((r) => r.status === "created").map((r) => r.nomeAzienda).join(", "),
     }).catch(() => {});
   }
 

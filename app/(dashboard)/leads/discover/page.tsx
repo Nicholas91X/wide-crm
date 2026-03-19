@@ -147,13 +147,15 @@ export default function DiscoverPage() {
           const existingLeads = await existingRes.json();
           const existingNames = new Set<string>(
             existingLeads
-              .map((l: any) => l.nomeAzienda?.toLowerCase().trim())
+              .map((l: { nomeAzienda?: string }) =>
+                l.nomeAzienda?.toLowerCase().trim(),
+              )
               .filter(Boolean),
           );
           const existingUrls = new Set<string>(
             existingLeads
-              .filter((l: any) => l.sitoWeb)
-              .map((l: any) =>
+              .filter((l: { sitoWeb?: string }) => l.sitoWeb)
+              .map((l: { sitoWeb?: string }) =>
                 l.sitoWeb?.toLowerCase().trim().replace(/\/$/, ""),
               ),
           );
@@ -185,9 +187,10 @@ export default function DiscoverPage() {
 
       setStatus("done");
       setStatusText("");
-    } catch (err: any) {
-      if (err.name !== "AbortError") {
-        toast.error(err.message || "Errore nella ricerca");
+    } catch (err) {
+      const error = err as Error;
+      if (error.name !== "AbortError") {
+        toast.error(error.message || "Errore nella ricerca");
         setStatus("idle");
         setFormExpanded(true);
       }
@@ -224,11 +227,15 @@ export default function DiscoverPage() {
       });
       setLeads(updatedLeads);
 
-      const created = results.filter((r: any) => r.status === "created").length;
-      const duplicates = results.filter(
-        (r: any) => r.status === "duplicate",
+      const created = results.filter(
+        (r: { status?: string }) => r.status === "created",
       ).length;
-      const errors = results.filter((r: any) => r.status === "error").length;
+      const duplicates = results.filter(
+        (r: { status?: string }) => r.status === "duplicate",
+      ).length;
+      const errors = results.filter(
+        (r: { status?: string }) => r.status === "error",
+      ).length;
 
       if (created > 0)
         toast.success(
@@ -277,8 +284,9 @@ export default function DiscoverPage() {
 
       setSelected(new Set());
       setStatus("done");
-    } catch (err: any) {
-      toast.error(err.message || "Errore nell'aggiunta");
+    } catch (err) {
+      const error = err as Error;
+      toast.error(error.message || "Errore nell'aggiunta");
       setStatus("done");
     }
   }

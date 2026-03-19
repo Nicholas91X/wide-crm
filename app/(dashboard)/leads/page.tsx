@@ -7,10 +7,8 @@ import {
   Sparkles,
   ChevronRight,
   Globe,
-  Users,
   Calendar,
   User,
-  TrendingUp,
   Search,
 } from "lucide-react";
 import { SearchLog } from "@/lib/types";
@@ -295,48 +293,58 @@ export default function LeadsPage() {
                           Lead trovati
                         </p>
                         <div className="space-y-2">
-                          {log.leads.map((l: any, i: number) => (
-                            <div
-                              key={i}
-                              className="flex items-start gap-3 py-2 border-b border-white/5 last:border-0"
-                            >
+                          {log.leads.map(
+                            (
+                              l: {
+                                aggiunto?: boolean;
+                                nomeAzienda?: string;
+                                sitoWeb?: string;
+                                note?: string;
+                              },
+                              i: number,
+                            ) => (
                               <div
-                                className={`w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0 ${l.aggiunto ? "bg-green-400" : "bg-[#333]"}`}
-                              />
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  <span className="text-xs font-semibold text-[#ddd]">
-                                    {l.nomeAzienda}
-                                  </span>
-                                  {l.aggiunto && (
-                                    <span className="text-[11px] text-[#999] font-bold">
-                                      Aggiunto
+                                key={i}
+                                className="flex items-start gap-3 py-2 border-b border-white/5 last:border-0"
+                              >
+                                <div
+                                  className={`w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0 ${l.aggiunto ? "bg-green-400" : "bg-[#333]"}`}
+                                />
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <span className="text-xs font-semibold text-[#ddd]">
+                                      {l.nomeAzienda}
                                     </span>
-                                  )}
-                                </div>
-                                <div className="flex items-center gap-3 mt-0.5 flex-wrap">
-                                  {l.sitoWeb && (
-                                    <a
-                                      href={l.sitoWeb}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="flex items-center gap-1 text-[11px] text-[#555] hover:text-[#c9a96e]"
-                                    >
-                                      <Globe size={9} />
-                                      {l.sitoWeb
-                                        .replace(/^https?:\/\//, "")
-                                        .slice(0, 30)}
-                                    </a>
-                                  )}
-                                  {l.note && (
-                                    <span className="text-[11px] text-[#888] italic truncate max-w-[200px]">
-                                      {l.note}
-                                    </span>
-                                  )}
+                                    {l.aggiunto && (
+                                      <span className="text-[11px] text-[#999] font-bold">
+                                        Aggiunto
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="flex items-center gap-3 mt-0.5 flex-wrap">
+                                    {l.sitoWeb && (
+                                      <a
+                                        href={l.sitoWeb}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-1 text-[11px] text-[#555] hover:text-[#c9a96e]"
+                                      >
+                                        <Globe size={9} />
+                                        {l.sitoWeb
+                                          .replace(/^https?:\/\//, "")
+                                          .slice(0, 30)}
+                                      </a>
+                                    )}
+                                    {l.note && (
+                                      <span className="text-[11px] text-[#888] italic truncate max-w-[200px]">
+                                        {l.note}
+                                      </span>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          ))}
+                            ),
+                          )}
                         </div>
                       </div>
                     ) : (

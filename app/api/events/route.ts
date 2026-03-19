@@ -4,12 +4,12 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { getEvents, createEvent, logAction } from "@/lib/db";
 import { getRoleFromEmail } from "@/lib/auth";
 
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const userEmail = session.user?.email;
-  const userRole = (session.user as any).role || getRoleFromEmail(userEmail || "");
+  const userRole = (session.user as { role?: string }).role || getRoleFromEmail(userEmail || "");
 
   try {
     let events = await getEvents();
@@ -32,8 +32,9 @@ export async function GET(req: NextRequest) {
     }
     
     return NextResponse.json(events);
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err) {
+    const error = err as Error;
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
@@ -41,7 +42,7 @@ export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   
-  const role = (session.user as any).role || getRoleFromEmail(session.user?.email || "");
+  const role = (session.user as { role?: string }).role || getRoleFromEmail(session.user?.email || "");
 
   try {
     const data = await req.json();
@@ -61,7 +62,8 @@ export async function POST(req: NextRequest) {
     }).catch(() => {});
 
     return NextResponse.json(event, { status: 201 });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err) {
+    const error = err as Error;
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

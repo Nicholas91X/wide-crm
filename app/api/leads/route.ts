@@ -18,15 +18,16 @@ export async function GET(req: NextRequest) {
   try {
     const leads = await getLeads(filters);
     return NextResponse.json(leads);
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err) {
+    const error = err as Error;
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const role = (session.user as any).role;
+  const role = (session.user as { role?: string }).role;
   if (role !== "admin" && role !== "editor") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
@@ -42,7 +43,8 @@ export async function POST(req: NextRequest) {
       eseguitaDa: session.user?.email ?? "unknown",
     }).catch(() => {});
     return NextResponse.json(lead, { status: 201 });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err) {
+    const error = err as Error;
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

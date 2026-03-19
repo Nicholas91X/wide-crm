@@ -41,7 +41,7 @@ export interface Report {
   dataGenerazione: string;
   urlPagina: string;
   generatoDa: string;
-  contenuto: any;
+  contenuto: unknown;
 }
 
 export interface Client {
@@ -72,7 +72,7 @@ export interface SearchLog {
   effettuataDa: string;
   dataRicerca: string;
   metodo: string;
-  leadsJson: any[];
+  leadsJson: unknown[];
 }
 
 export interface Event {
@@ -82,6 +82,7 @@ export interface Event {
   inizio: string;
   fine: string;
   membro: string;
+  collaboratori?: string;
   leadId: string;
   tipo: string;
   note: string;
@@ -112,100 +113,101 @@ export interface AuditEntry {
 
 // ─── Mapping Helpers ─────────────────────────────────────────────────────────
 
-function mapLeadFromSupabase(row: any): Lead {
+function mapLeadFromSupabase(row: Record<string, unknown>): Lead {
   return {
-    id: row.id,
-    createdTime: row.created_at,
-    lastEdited: row.last_edited_at,
-    nomeAzienda: row.nome_azienda || "",
-    settore: row.settore || "",
-    territorio: row.territorio || "",
-    sitoWeb: row.sito_web || "",
-    profiloSocial: row.profilo_social || "",
-    profiloSocial2: row.profilo_social_2 || "",
-    profiloSocial3: row.profilo_social_3 || "",
-    profiloInstagram: row.profilo_instagram || "",
-    profiloFacebook: row.profilo_facebook || "",
-    profiloLinkedIn: row.profilo_linkedin || "",
-    profiloTikTok: row.profilo_tiktok || "",
-    canale: row.canale || "",
-    note: row.note || "",
-    score: row.score || "",
-    stato: row.stato || "",
-    dataCreazioneReport: row.data_creazione_report || "",
-    dataPrimoContatto: row.data_primo_contatto || "",
-    dataSecondoContatto: row.data_secondo_contatto || "",
-    dataFollowUp: row.data_follow_up || "",
-    risposta: row.risposta || "",
-    urlReport: row.url_report || "",
-    inseritoDA: row.inserito_da || "",
+    id: row.id as string,
+    createdTime: row.created_at as string,
+    lastEdited: row.last_edited_at as string,
+    nomeAzienda: (row.nome_azienda as string) || "",
+    settore: (row.settore as string) || "",
+    territorio: (row.territorio as string) || "",
+    sitoWeb: (row.sito_web as string) || "",
+    profiloSocial: (row.profilo_social as string) || "",
+    profiloSocial2: (row.profilo_social_2 as string) || "",
+    profiloSocial3: (row.profilo_social_3 as string) || "",
+    profiloInstagram: (row.profilo_instagram as string) || "",
+    profiloFacebook: (row.profilo_facebook as string) || "",
+    profiloLinkedIn: (row.profilo_linkedin as string) || "",
+    profiloTikTok: (row.profilo_tiktok as string) || "",
+    canale: (row.canale as string) || "",
+    note: (row.note as string) || "",
+    score: (row.score as string) || "",
+    stato: (row.stato as string) || "",
+    dataCreazioneReport: (row.data_creazione_report as string) || "",
+    dataPrimoContatto: (row.data_primo_contatto as string) || "",
+    dataSecondoContatto: (row.data_secondo_contatto as string) || "",
+    dataFollowUp: (row.data_follow_up as string) || "",
+    risposta: (row.risposta as string) || "",
+    urlReport: (row.url_report as string) || "",
+    inseritoDA: (row.inserito_da as string) || "",
   };
 }
 
-function mapReportFromSupabase(row: any): Report {
+function mapReportFromSupabase(row: Record<string, unknown>): Report {
   return {
-    id: row.id,
-    createdTime: row.created_at,
-    titolo: row.titolo || "",
-    azienda: row.azienda || "",
-    settore: row.settore || "",
-    leadId: row.lead_id || "",
-    token: row.token || "",
-    stato: row.stato || "",
-    esito: row.esito || "",
-    dataGenerazione: row.data_generazione || "",
-    urlPagina: row.url_pagina || "",
-    generatoDa: row.generato_da || "",
+    id: row.id as string,
+    createdTime: row.created_at as string,
+    titolo: (row.titolo as string) || "",
+    azienda: (row.azienda as string) || "",
+    settore: (row.settore as string) || "",
+    leadId: (row.lead_id as string) || "",
+    token: (row.token as string) || "",
+    stato: (row.stato as string) || "",
+    esito: (row.esito as string) || "",
+    dataGenerazione: (row.data_generazione as string) || "",
+    urlPagina: (row.url_pagina as string) || "",
+    generatoDa: (row.generato_da as string) || "",
     contenuto: row.contenuto || null,
   };
 }
 
-function mapClientFromSupabase(row: any): Client {
+function mapClientFromSupabase(row: Record<string, unknown>): Client {
   return {
-    id: row.id,
-    createdTime: row.created_at,
-    nome: row.nome || "",
-    settore: row.settore || "",
-    valoreNetto: row.valore_netto || 0,
-    dataInizio: row.data_inizio || "",
-    prossimoRinnovo: row.prossimo_rinnovo || "",
-    statoContratto: row.stato_contratto || "",
-    responsabile: row.responsabile || "",
-    note: row.note || "",
-    sitoWeb: row.sito_web || "",
+    id: row.id as string,
+    createdTime: row.created_at as string,
+    nome: (row.nome as string) || "",
+    settore: (row.settore as string) || "",
+    valoreNetto: (row.valore_netto as number) || 0,
+    dataInizio: (row.data_inizio as string) || "",
+    prossimoRinnovo: (row.prossimo_rinnovo as string) || "",
+    statoContratto: (row.stato_contratto as string) || "",
+    responsabile: (row.responsabile as string) || "",
+    note: (row.note as string) || "",
+    sitoWeb: (row.sito_web as string) || "",
   };
 }
 
-function mapSearchLogFromSupabase(row: any): SearchLog {
+function mapSearchLogFromSupabase(row: Record<string, unknown>): SearchLog {
   return {
-    id: row.id,
-    createdTime: row.created_at,
-    titolo: row.titolo || "",
-    settore: row.settore || "",
-    territorio: row.territorio || "",
-    tipoAttivita: row.tipo_attivita || "",
-    criteriAggiuntivi: row.criteri_aggiuntivi || "",
-    numRichiesti: row.num_richiesti || 0,
-    numTrovati: row.num_trovati || 0,
-    numAggiunti: row.num_aggiunti || 0,
-    effettuataDa: row.effettuata_da || "",
-    dataRicerca: row.data_ricerca || "",
-    metodo: row.metodo || "",
-    leadsJson: row.leads_json || [],
+    id: row.id as string,
+    createdTime: row.created_at as string,
+    titolo: (row.titolo as string) || "",
+    settore: (row.settore as string) || "",
+    territorio: (row.territorio as string) || "",
+    tipoAttivita: (row.tipo_attivita as string) || "",
+    criteriAggiuntivi: (row.criteri_aggiuntivi as string) || "",
+    numRichiesti: (row.num_richiesti as number) || 0,
+    numTrovati: (row.num_trovati as number) || 0,
+    numAggiunti: (row.num_aggiunti as number) || 0,
+    effettuataDa: (row.effettuata_da as string) || "",
+    dataRicerca: (row.data_ricerca as string) || "",
+    metodo: (row.metodo as string) || "",
+    leadsJson: (row.leads_json as unknown[]) || [],
   };
 }
 
-function mapEventFromSupabase(row: any): Event {
+function mapEventFromSupabase(row: Record<string, unknown>): Event {
   return {
-    id: row.id,
-    createdTime: row.created_at,
-    titolo: row.titolo || "",
-    inizio: row.inizio || "",
-    fine: row.fine || "",
-    membro: row.membro || "",
-    leadId: row.lead_id || "",
-    tipo: row.tipo || "",
-    note: row.note || "",
+    id: row.id as string,
+    createdTime: row.created_at as string,
+    titolo: (row.titolo as string) || "",
+    inizio: (row.inizio as string) || "",
+    fine: (row.fine as string) || "",
+    membro: (row.membro as string) || "",
+    collaboratori: (row.collaboratori as string) || "",
+    leadId: (row.lead_id as string) || "",
+    tipo: (row.tipo as string) || "",
+    note: (row.note as string) || "",
   };
 }
 
@@ -288,11 +290,9 @@ export async function createLead(lead: Partial<Lead>): Promise<Lead> {
     .single();
   if (error) throw error;
   return mapLeadFromSupabase(data);
-  if (error) throw error;
-  return mapLeadFromSupabase(data);
 }
 
-export async function createLeads(leads: any[]): Promise<Lead[]> {
+export async function createLeads(leads: Partial<Lead>[]): Promise<Lead[]> {
   const { data, error } = await supabase
     .from("leads")
     .insert(leads.map(l => ({
@@ -318,7 +318,7 @@ export async function createLeads(leads: any[]): Promise<Lead[]> {
 }
 
 export async function updateLead(id: string, updates: Partial<Lead>): Promise<Lead> {
-  const mappedUpdates: any = {};
+  const mappedUpdates: Record<string, unknown> = {};
   if (updates.nomeAzienda !== undefined) mappedUpdates.nome_azienda = updates.nomeAzienda;
   if (updates.settore !== undefined) mappedUpdates.settore = updates.settore;
   if (updates.territorio !== undefined) mappedUpdates.territorio = updates.territorio;
@@ -430,7 +430,7 @@ export async function createReport(report: Partial<Report>): Promise<Report> {
 }
 
 export async function updateReport(id: string, updates: Partial<Report>): Promise<Report> {
-  const mappedUpdates: any = {};
+  const mappedUpdates: Record<string, unknown> = {};
   if (updates.titolo !== undefined) mappedUpdates.titolo = updates.titolo;
   if (updates.azienda !== undefined) mappedUpdates.azienda = updates.azienda;
   if (updates.settore !== undefined) mappedUpdates.settore = updates.settore;
@@ -502,7 +502,7 @@ export async function createClient(client: Partial<Client>): Promise<Client> {
 }
 
 export async function updateClient(id: string, updates: Partial<Client>): Promise<Client> {
-  const mappedUpdates: any = {};
+  const mappedUpdates: Record<string, unknown> = {};
   if (updates.nome !== undefined) mappedUpdates.nome = updates.nome;
   if (updates.settore !== undefined) mappedUpdates.settore = updates.settore;
   if (updates.valoreNetto !== undefined) mappedUpdates.valore_netto = updates.valoreNetto;
@@ -592,6 +592,7 @@ export async function createEvent(event: Partial<Event>): Promise<Event> {
       inizio: event.inizio,
       fine: event.fine,
       membro: event.membro,
+      collaboratori: event.collaboratori,
       lead_id: event.leadId,
       tipo: event.tipo,
       note: event.note,
@@ -603,11 +604,12 @@ export async function createEvent(event: Partial<Event>): Promise<Event> {
 }
 
 export async function updateEvent(id: string, updates: Partial<Event>): Promise<Event> {
-  const mappedUpdates: any = {};
+  const mappedUpdates: Record<string, unknown> = {};
   if (updates.titolo !== undefined) mappedUpdates.titolo = updates.titolo;
   if (updates.inizio !== undefined) mappedUpdates.inizio = updates.inizio;
   if (updates.fine !== undefined) mappedUpdates.fine = updates.fine;
   if (updates.membro !== undefined) mappedUpdates.membro = updates.membro;
+  if (updates.collaboratori !== undefined) mappedUpdates.collaboratori = updates.collaboratori;
   if (updates.leadId !== undefined) mappedUpdates.lead_id = updates.leadId;
   if (updates.tipo !== undefined) mappedUpdates.tipo = updates.tipo;
   if (updates.note !== undefined) mappedUpdates.note = updates.note;
@@ -660,16 +662,16 @@ export async function getAuditLogs(limit: number = 100): Promise<AuditEntry[]> {
   return (data || []).map(mapAuditEntryFromSupabase);
 }
 
-function mapAuditEntryFromSupabase(row: any): AuditEntry {
+function mapAuditEntryFromSupabase(row: Record<string, unknown>): AuditEntry {
   return {
-    id: row.id,
-    created_at: row.created_at,
+    id: row.id as string,
+    created_at: row.created_at as string,
     azione: row.azione as AuditAzione,
     entita: row.entita as AuditEntita,
-    nome_entita: row.nome_entita || "",
-    entita_id: row.entita_id,
-    eseguita_da: row.eseguita_da || "",
-    dettagli: row.dettagli,
+    nome_entita: (row.nome_entita as string) || "",
+    entita_id: (row.entita_id as string) || undefined,
+    eseguita_da: (row.eseguita_da as string) || "",
+    dettagli: row.dettagli as string | undefined,
   };
 }
 

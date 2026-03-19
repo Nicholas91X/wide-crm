@@ -3,22 +3,23 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { getLead, updateLead, deleteLead, logAction } from "@/lib/db";
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
     const lead = await getLead(params.id);
     return NextResponse.json(lead);
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err) {
+    const error = err as Error;
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const role = (session.user as any).role;
+  const role = (session.user as { role?: string }).role;
   if (role !== "admin" && role !== "editor") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
@@ -34,15 +35,16 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       eseguitaDa: session.user?.email ?? "unknown",
     }).catch(() => {});
     return NextResponse.json(lead);
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err) {
+    const error = err as Error;
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const role = (session.user as any).role;
+  const role = (session.user as { role?: string }).role;
   if (role !== "admin" && role !== "editor") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
@@ -60,7 +62,8 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
       }).catch(() => {});
     }
     return NextResponse.json({ success: true });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err) {
+    const error = err as Error;
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

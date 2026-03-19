@@ -3,10 +3,10 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { getLead, updateLead, createClient } from "@/lib/db";
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(_req: NextRequest, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const role = (session.user as any).role;
+  const role = (session.user as { role?: string }).role;
   if (role !== "admin" && role !== "editor") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
@@ -23,7 +23,8 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       responsabile: session.user?.name ?? "",
     });
     return NextResponse.json({ success: true });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err) {
+    const error = err as Error;
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

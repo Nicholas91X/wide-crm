@@ -10,15 +10,16 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     const client = await getClient(params.id);
     if (!client) return NextResponse.json({ error: "Cliente non trovato" }, { status: 404 });
     return NextResponse.json(client);
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err) {
+    const error = err as Error;
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const role = (session.user as any)?.role;
+  const role = (session.user as { role?: string })?.role;
   if (role !== "admin" && role !== "editor") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   try {
     const data = await req.json();
@@ -26,15 +27,16 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     if (!client) return NextResponse.json({ error: "Cliente non trovato" }, { status: 404 });
     logAction({ azione: "Modifica", entita: "Cliente", nomeEntita: client.nome, entitaId: params.id, eseguitaDa: session.user?.email ?? "unknown" }).catch(() => {});
     return NextResponse.json(client);
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err) {
+    const error = err as Error;
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const role = (session.user as any)?.role;
+  const role = (session.user as { role?: string })?.role;
   if (role !== "admin" && role !== "editor") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   try {
     const client = await getClient(params.id);
@@ -42,7 +44,8 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
     await deleteClient(params.id);
     logAction({ azione: "Eliminazione", entita: "Cliente", nomeEntita: client.nome, entitaId: params.id, eseguitaDa: session.user?.email ?? "unknown" }).catch(() => {});
     return NextResponse.json({ success: true });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err) {
+    const error = err as Error;
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

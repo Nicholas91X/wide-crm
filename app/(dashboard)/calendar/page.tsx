@@ -10,10 +10,10 @@ import {
   Clock,
   User,
   Tag,
-  MoreVertical,
-  X,
   List,
   Calendar as CalendarGrid,
+  Check,
+  ChevronDown,
 } from "lucide-react";
 import {
   format,
@@ -51,6 +51,11 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -60,6 +65,7 @@ interface Event {
   inizio: string;
   fine: string;
   membro: string;
+  collaboratori?: string;
   leadId: string;
   tipo: string;
   note: string;
@@ -106,6 +112,9 @@ export default function CalendarPage() {
   const { data: session } = useSession();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [events, setEvents] = useState<Event[]>([]);
+  const [appUsers, setAppUsers] = useState<{ email: string; role: string }[]>(
+    [],
+  );
   const [loading, setLoading] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -118,16 +127,53 @@ export default function CalendarPage() {
     fine: "",
     tipo: "Meet",
     membro: "",
+    collaboratori: "",
     note: "",
     leadId: "",
   });
 
-  const role = (session?.user as any)?.role;
+  const role = (session?.user as { role?: string })?.role;
   const userEmail = session?.user?.email ?? "";
+
+  const currentCollaboratori = formData.collaboratori
+    ? formData.collaboratori
+        .split(",")
+        .map((e) => e.trim())
+        .filter(Boolean)
+    : [];
+
+  const toggleCollaboratore = (email: string) => {
+    if (currentCollaboratori.includes(email)) {
+      setFormData({
+        ...formData,
+        collaboratori: currentCollaboratori
+          .filter((e) => e !== email)
+          .join(", "),
+      });
+    } else {
+      setFormData({
+        ...formData,
+        collaboratori: [...currentCollaboratori, email].join(", "),
+      });
+    }
+  };
 
   useEffect(() => {
     fetchEvents();
+    fetchUsers();
   }, []);
+
+  async function fetchUsers() {
+    try {
+      const res = await fetch("/api/users");
+      if (res.ok) {
+        const data = await res.json();
+        setAppUsers(data);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
   async function fetchEvents() {
     try {
@@ -136,8 +182,8 @@ export default function CalendarPage() {
       if (!res.ok) throw new Error("Errore nel caricamento eventi");
       const data = await res.json();
       setEvents(data);
-    } catch (err: any) {
-      toast.error(err.message);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : String(err));
     } finally {
       setLoading(false);
     }
@@ -156,6 +202,7 @@ export default function CalendarPage() {
       fine: format(day, "yyyy-MM-dd'T'HH:mm"),
       tipo: "Meet",
       membro: userEmail,
+      collaboratori: "",
       note: "",
       leadId: "",
     });
@@ -171,6 +218,7 @@ export default function CalendarPage() {
       fine: e.fine ? format(parseISO(e.fine), "yyyy-MM-dd'T'HH:mm") : "",
       tipo: e.tipo,
       membro: e.membro,
+      collaboratori: e.collaboratori || "",
       note: e.note,
       leadId: e.leadId,
     });
@@ -200,8 +248,8 @@ export default function CalendarPage() {
       toast.success(selectedEvent ? "Evento aggiornato" : "Evento creato");
       setIsDialogOpen(false);
       fetchEvents();
-    } catch (err: any) {
-      toast.error(err.message);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : String(err));
     }
   };
 
@@ -217,8 +265,8 @@ export default function CalendarPage() {
       toast.success("Evento eliminato");
       setIsDialogOpen(false);
       fetchEvents();
-    } catch (err: any) {
-      toast.error(err.message);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : String(err));
     } finally {
       setIsDeleting(false);
     }
@@ -321,9 +369,9 @@ export default function CalendarPage() {
 
   const renderAgenda = () => {
     const monthStart = startOfMonth(currentMonth);
-    const monthEnd = endOfMonth(monthStart);
-    const startDate = monthStart;
-    const endDate = monthEnd;
+    const monthEnd = endOfMonth(currentMonth);
+    const startDate = startOfWeek(monthStart, { weekStartsOn: 1 });
+    const endDate = endOfWeek(monthEnd, { weekStartsOn: 1 });
 
     const days = [];
     let day = startDate;
@@ -338,9 +386,9 @@ export default function CalendarPage() {
         <div
           key={day.toString()}
           className={cn(
-            "border-b border-white/5 p-4 transition-colors flex gap-4",
+            "border-b border-white/5 p-4 transition-colors flex gap-4 last:border-0",
+            !isSameMonth(day, monthStart) ? "opacity-50" : "",
             isToday(day) && "bg-[#c9a96e]/5",
-            dayEvents.length > 0 ? "opacity-100" : "opacity-40",
           )}
           onClick={() => onDateClick(cloneDay)}
         >
@@ -363,7 +411,7 @@ export default function CalendarPage() {
               dayEvents.map((event: Event) => {
                 const typeInfo =
                   EVENT_TYPES.find((t) => t.value === event.tipo) ||
-                  EVENT_TYPES[3];
+                  EVENT_TYPES[9]; // Altro
                 return (
                   <div
                     key={event.id}
@@ -393,8 +441,10 @@ export default function CalendarPage() {
                 );
               })
             ) : (
-              <div className="h-full flex items-center italic text-[#888] text-xs">
-                Nessun evento
+              <div className="h-full flex items-center min-h-[48px]">
+                <span className="text-xs text-[#555] italic">
+                  Nessun evento
+                </span>
               </div>
             )}
           </div>
@@ -633,7 +683,7 @@ export default function CalendarPage() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="inizio" className="text-xs text-[#ccc]">
                   Inizio
@@ -676,7 +726,7 @@ export default function CalendarPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="tipo" className="text-xs text-[#ccc]">
                   Tipo
@@ -719,6 +769,65 @@ export default function CalendarPage() {
                   />
                 </div>
               </div>
+            </div>
+
+            <div className="space-y-2 flex flex-col">
+              <Label htmlFor="collaboratori" className="text-xs text-[#ccc]">
+                Collaboratori
+              </Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    className="w-full justify-between bg-white/5 border-white/10 text-left font-normal h-10 px-3 hover:bg-white/10"
+                  >
+                    {currentCollaboratori.length > 0
+                      ? `${currentCollaboratori.length} selezionati`
+                      : "Seleziona collaboratori..."}
+                    <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="w-[300px] p-0 flex flex-col bg-[#1a1a1a] border-white/10 text-white"
+                  align="start"
+                >
+                  <div className="max-h-60 overflow-y-auto">
+                    {appUsers.length > 0 ? (
+                      appUsers.map((u) => (
+                        <div
+                          key={u.email}
+                          onClick={() => toggleCollaboratore(u.email)}
+                          className={cn(
+                            "flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-white/10 text-sm",
+                            currentCollaboratori.includes(u.email)
+                              ? "bg-white/5"
+                              : "",
+                          )}
+                        >
+                          <div
+                            className={cn(
+                              "flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border border-white/20",
+                              currentCollaboratori.includes(u.email)
+                                ? "bg-[#c9a96e] border-[#c9a96e] text-black"
+                                : "opacity-50",
+                            )}
+                          >
+                            {currentCollaboratori.includes(u.email) && (
+                              <Check className="h-3 w-3" />
+                            )}
+                          </div>
+                          <span className="truncate">{u.email}</span>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="p-3 text-sm text-center opacity-50">
+                        Nessun utente trovato
+                      </div>
+                    )}
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
 
             <div className="space-y-2">

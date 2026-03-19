@@ -63,8 +63,9 @@ export default function NewLeadPage() {
       const lead = await res.json();
       toast.success("Lead creato con successo");
       router.push(`/pipeline/${lead.id}`);
-    } catch (err: any) {
-      toast.error(err.message || "Errore nella creazione");
+    } catch (err) {
+      const error = err as Error;
+      toast.error(error.message || "Errore nella creazione");
     } finally {
       setLoading(false);
     }

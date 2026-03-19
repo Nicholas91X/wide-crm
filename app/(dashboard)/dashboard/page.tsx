@@ -1,4 +1,4 @@
-import { getLeads, getReports, getClients } from "@/lib/db";
+import { getLeads, getReports, getClients, getEvents } from "@/lib/db";
 import { STATI_LEAD } from "@/lib/types";
 import {
   GitBranch,
@@ -9,6 +9,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import Link from "next/link";
+import { EventsWidget } from "@/components/EventsWidget";
 
 function formatDate(d: string) {
   if (!d) return "-";
@@ -50,10 +51,11 @@ const STATO_COLORS: Record<string, string> = {
 };
 
 export default async function DashboardPage() {
-  const [leads, reports, clients] = await Promise.all([
+  const [leads, reports, clients, events] = await Promise.all([
     getLeads().catch(() => []),
     getReports().catch(() => []),
     getClients().catch(() => []),
+    getEvents().catch(() => []),
   ]);
 
   const now = new Date();
@@ -196,8 +198,13 @@ export default async function DashboardPage() {
           )}
         </div>
 
+        {/* Events Widget */}
+        <div className="lg:col-span-1">
+          <EventsWidget events={events} />
+        </div>
+
         {/* Follow-up urgenti */}
-        <div className="lg:col-span-2 glass-dark border border-white/5 rounded-xl p-5">
+        <div className="lg:col-span-1 glass-dark border border-white/5 rounded-xl p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-bold text-[#f5f5f5] flex items-center gap-2">
               <Calendar size={14} className="text-[#c9a96e]" />

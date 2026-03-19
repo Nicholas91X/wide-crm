@@ -63,8 +63,8 @@ function formatTavilyContext(results: TavilyResult[]): string {
 
 // ─── Lead parser ──────────────────────────────────────────────────────────────
 
-function parseLeadsFromText(text: string): any[] {
-  const leads: any[] = [];
+function parseLeadsFromText(text: string): Record<string, unknown>[] {
+  const leads: Record<string, unknown>[] = [];
   for (const line of text.split("\n")) {
     const trimmed = line.trim();
     if (trimmed.startsWith("__LEAD__:")) {
@@ -118,7 +118,7 @@ export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const role = (session.user as any)?.role;
+  const role = (session.user as { role?: string })?.role;
   if (role !== "admin" && role !== "editor") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
@@ -202,14 +202,14 @@ ${userPromptBase}`;
             max_tokens: 2048,
             system: SYSTEM_WEBSEARCH,
             tools: [
-              { type: "web_search_20250305" as any, name: "web_search", max_uses: 6 } as any,
+              { type: "web_search_20250305" as const, name: "web_search", max_uses: 6 },
             ],
             messages: [{ role: "user", content: userPromptBase }],
           });
 
           const wsText = wsResponse.content
-            .filter((b: any) => b.type === "text")
-            .map((b: any) => b.text)
+            .filter((b): b is Anthropic.TextBlock => b.type === "text")
+            .map((b) => b.text)
             .join("\n");
 
           const wsLeads = parseLeadsFromText(wsText);
@@ -245,8 +245,9 @@ ${userPromptBase}`;
         send("\n__DONE__");
         controller.close();
 
-      } catch (err: any) {
-        send(`\n__ERROR__:${err.message}`);
+      } catch (err) {
+        const error = err as Error;
+        send(`\n__ERROR__:${error.message}`);
         controller.close();
       }
     },

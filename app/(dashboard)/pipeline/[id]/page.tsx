@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
@@ -47,7 +47,7 @@ export default function LeadDetailPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { data: session } = useSession();
-  const role = (session?.user as any)?.role;
+  const role = (session?.user as { role?: string })?.role;
   const canEdit = role === "admin" || role === "editor";
 
   const [lead, setLead] = useState<Lead | null>(null);
@@ -93,7 +93,7 @@ export default function LeadDetailPage() {
     }
   }, [id]);
 
-  function setField(key: keyof Lead, value: any) {
+  function setField<K extends keyof Lead>(key: K, value: Lead[K]) {
     setForm((f) => ({ ...f, [key]: value }));
   }
 
@@ -245,8 +245,9 @@ export default function LeadDetailPage() {
       setReportDone(true);
       loadLead();
       toast.success("Report generato con successo");
-    } catch (err: any) {
-      toast.error(err.message || "Errore nella generazione");
+    } catch (err) {
+      const error = err as Error;
+      toast.error(error.message || "Errore nella generazione");
     } finally {
       setGenerating(false);
     }
