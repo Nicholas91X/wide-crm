@@ -56,7 +56,9 @@ export default function LeadDetailPage() {
   const [deleting, setDeleting] = useState(false);
   const [form, setForm] = useState<Partial<Lead>>({});
 
-  const [activities, setActivities] = useState<Array<{ date: string; text: string; author: string }>>([]);
+  const [activities, setActivities] = useState<
+    Array<{ date: string; text: string; author: string }>
+  >([]);
   const [activitiesLoading, setActivitiesLoading] = useState(true);
   const [newActivity, setNewActivity] = useState("");
   const [addingActivity, setAddingActivity] = useState(false);
@@ -116,7 +118,12 @@ export default function LeadDetailPage() {
   }
 
   async function deleteLead() {
-    if (!confirm(`Eliminare definitivamente "${lead?.nomeAzienda}"? L'operazione non può essere annullata.`)) return;
+    if (
+      !confirm(
+        `Eliminare definitivamente "${lead?.nomeAzienda}"? L'operazione non può essere annullata.`,
+      )
+    )
+      return;
     setDeleting(true);
     try {
       const res = await fetch(`/api/leads/${id}`, { method: "DELETE" });
@@ -370,23 +377,25 @@ export default function LeadDetailPage() {
                 </div>
                 <div className="space-y-1">
                   <Label className="text-[10px] uppercase text-[#555] font-bold tracking-tight">
-                    Profilo Social 1
+                    Profilo Social Generico
                   </Label>
                   <Input
                     value={form.profiloSocial ?? ""}
                     onChange={(e) => setField("profiloSocial", e.target.value)}
                     disabled={!canEdit}
                     className="glass border-white/5 text-sm h-10"
-                    placeholder="https://instagram.com/..."
+                    placeholder="https://..."
                   />
                 </div>
                 <div className="space-y-1">
                   <Label className="text-[10px] uppercase text-[#555] font-bold tracking-tight">
-                    Profilo Social 2
+                    Facebook
                   </Label>
                   <Input
-                    value={form.profiloSocial2 ?? ""}
-                    onChange={(e) => setField("profiloSocial2", e.target.value)}
+                    value={form.profiloFacebook ?? ""}
+                    onChange={(e) =>
+                      setField("profiloFacebook", e.target.value)
+                    }
                     disabled={!canEdit}
                     className="glass border-white/5 text-sm h-10"
                     placeholder="https://facebook.com/..."
@@ -394,14 +403,42 @@ export default function LeadDetailPage() {
                 </div>
                 <div className="space-y-1">
                   <Label className="text-[10px] uppercase text-[#555] font-bold tracking-tight">
-                    Profilo Social 3
+                    Instagram
                   </Label>
                   <Input
-                    value={form.profiloSocial3 ?? ""}
-                    onChange={(e) => setField("profiloSocial3", e.target.value)}
+                    value={form.profiloInstagram ?? ""}
+                    onChange={(e) =>
+                      setField("profiloInstagram", e.target.value)
+                    }
+                    disabled={!canEdit}
+                    className="glass border-white/5 text-sm h-10"
+                    placeholder="https://instagram.com/..."
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-[10px] uppercase text-[#555] font-bold tracking-tight">
+                    LinkedIn
+                  </Label>
+                  <Input
+                    value={form.profiloLinkedIn ?? ""}
+                    onChange={(e) =>
+                      setField("profiloLinkedIn", e.target.value)
+                    }
                     disabled={!canEdit}
                     className="glass border-white/5 text-sm h-10"
                     placeholder="https://linkedin.com/..."
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-[10px] uppercase text-[#555] font-bold tracking-tight">
+                    TikTok
+                  </Label>
+                  <Input
+                    value={form.profiloTikTok ?? ""}
+                    onChange={(e) => setField("profiloTikTok", e.target.value)}
+                    disabled={!canEdit}
+                    className="glass border-white/5 text-sm h-10"
+                    placeholder="https://tiktok.com/..."
                   />
                 </div>
               </div>
@@ -532,7 +569,9 @@ export default function LeadDetailPage() {
                 <Input
                   type="date"
                   value={form.dataPrimoContatto ?? ""}
-                  onChange={(e) => setField("dataPrimoContatto", e.target.value)}
+                  onChange={(e) =>
+                    setField("dataPrimoContatto", e.target.value)
+                  }
                   disabled={!canEdit}
                   className="glass border-white/5 text-sm h-10"
                 />
@@ -545,7 +584,9 @@ export default function LeadDetailPage() {
                 <Input
                   type="date"
                   value={form.dataSecondoContatto ?? ""}
-                  onChange={(e) => setField("dataSecondoContatto", e.target.value)}
+                  onChange={(e) =>
+                    setField("dataSecondoContatto", e.target.value)
+                  }
                   disabled={!canEdit}
                   className="glass border-white/5 text-sm h-10"
                 />
@@ -591,7 +632,8 @@ export default function LeadDetailPage() {
                     onClick={markAcquired}
                     disabled={saving}
                   >
-                    <CheckCircle size={16} className="mr-2" /> Converti in Cliente
+                    <CheckCircle size={16} className="mr-2" /> Converti in
+                    Cliente
                   </Button>
                   <Button
                     variant="outline"
@@ -599,7 +641,11 @@ export default function LeadDetailPage() {
                     onClick={deleteLead}
                     disabled={deleting || saving}
                   >
-                    {deleting ? <Loader2 size={16} className="mr-2 animate-spin" /> : <Trash2 size={16} className="mr-2" />}
+                    {deleting ? (
+                      <Loader2 size={16} className="mr-2 animate-spin" />
+                    ) : (
+                      <Trash2 size={16} className="mr-2" />
+                    )}
                     Elimina Lead
                   </Button>
                 </div>
@@ -622,32 +668,62 @@ export default function LeadDetailPage() {
               <div className="flex gap-2">
                 <input
                   value={newActivity}
-                  onChange={e => setNewActivity(e.target.value)}
-                  onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); addActivity(); }}}
+                  onChange={(e) => setNewActivity(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      addActivity();
+                    }
+                  }}
                   placeholder="Aggiungi una nota (es: Chiamato, ha risposto positivamente...)"
                   className="flex-1 bg-[#0d0d0d] border border-white/5 rounded-md px-3 py-2 text-sm text-[#f5f5f5] placeholder:text-[#333] outline-none focus:border-[#c9a96e]/30 transition-colors"
                   disabled={addingActivity}
                 />
-                <Button onClick={addActivity} disabled={addingActivity || !newActivity.trim()} className="bg-[#c9a96e] hover:bg-[#b8945a] text-[#0a0a0a] font-bold px-4">
-                  {addingActivity ? <Loader2 size={14} className="animate-spin" /> : "Aggiungi"}
+                <Button
+                  onClick={addActivity}
+                  disabled={addingActivity || !newActivity.trim()}
+                  className="bg-[#c9a96e] hover:bg-[#b8945a] text-[#0a0a0a] font-bold px-4"
+                >
+                  {addingActivity ? (
+                    <Loader2 size={14} className="animate-spin" />
+                  ) : (
+                    "Aggiungi"
+                  )}
                 </Button>
               </div>
             )}
             {activitiesLoading ? (
               <div className="space-y-2">
-                {[1,2].map(i => <div key={i} className="h-12 bg-white/5 rounded-lg animate-pulse" />)}
+                {[1, 2].map((i) => (
+                  <div
+                    key={i}
+                    className="h-12 bg-white/5 rounded-lg animate-pulse"
+                  />
+                ))}
               </div>
             ) : activities.length === 0 ? (
-              <p className="text-[#444] text-sm text-center py-4">Nessuna attività registrata</p>
+              <p className="text-[#444] text-sm text-center py-4">
+                Nessuna attività registrata
+              </p>
             ) : (
               <div className="space-y-2">
                 {activities.map((a, i) => (
-                  <div key={i} className="flex gap-3 py-2 border-b border-white/5 last:border-0">
+                  <div
+                    key={i}
+                    className="flex gap-3 py-2 border-b border-white/5 last:border-0"
+                  >
                     <div className="w-1.5 h-1.5 rounded-full bg-[#c9a96e]/40 mt-2 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-[#ddd]">{a.text}</p>
                       <p className="text-[10px] text-[#444] mt-0.5">
-                        {new Date(a.date).toLocaleString("it-IT", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })} · {a.author}
+                        {new Date(a.date).toLocaleString("it-IT", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}{" "}
+                        · {a.author}
                       </p>
                     </div>
                   </div>

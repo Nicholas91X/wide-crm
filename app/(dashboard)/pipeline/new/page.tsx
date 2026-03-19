@@ -27,6 +27,10 @@ export default function NewLeadPage() {
     territorio: "",
     sitoWeb: "",
     profiloSocial: "",
+    profiloFacebook: "",
+    profiloInstagram: "",
+    profiloLinkedIn: "",
+    profiloTikTok: "",
     canale: "",
     note: "",
   });
@@ -79,13 +83,17 @@ export default function NewLeadPage() {
         </Button>
         <div>
           <h1 className="text-2xl font-bold text-[#f5f5f5]">Nuovo Lead</h1>
-          <p className="text-[#888] text-sm">Aggiungi un nuovo lead alla pipeline</p>
+          <p className="text-[#888] text-sm">
+            Aggiungi un nuovo lead alla pipeline
+          </p>
         </div>
       </div>
 
       <Card className="bg-[#141414] border-[#1f1f1f]">
         <CardHeader>
-          <CardTitle className="text-base text-[#f5f5f5]">Informazioni Lead</CardTitle>
+          <CardTitle className="text-base text-[#f5f5f5]">
+            Informazioni Lead
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -106,13 +114,18 @@ export default function NewLeadPage() {
 
               <div className="space-y-2">
                 <Label className="text-[#f5f5f5]">Settore</Label>
-                <Select value={form.settore} onValueChange={(v) => set("settore", v)}>
+                <Select
+                  value={form.settore}
+                  onValueChange={(v) => set("settore", v)}
+                >
                   <SelectTrigger className="bg-[#0d0d0d] border-[#1f1f1f] text-[#f5f5f5]">
                     <SelectValue placeholder="Seleziona settore" />
                   </SelectTrigger>
                   <SelectContent className="bg-[#141414] border-[#1f1f1f]">
                     {SETTORI.map((s) => (
-                      <SelectItem key={s} value={s}>{s}</SelectItem>
+                      <SelectItem key={s} value={s}>
+                        {s}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -135,7 +148,9 @@ export default function NewLeadPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="sitoWeb" className="text-[#f5f5f5]">Sito Web</Label>
+                <Label htmlFor="sitoWeb" className="text-[#f5f5f5]">
+                  Sito Web
+                </Label>
                 <Input
                   id="sitoWeb"
                   type="url"
@@ -146,7 +161,9 @@ export default function NewLeadPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="profiloSocial" className="text-[#f5f5f5]">Profilo Social</Label>
+                <Label htmlFor="profiloSocial" className="text-[#f5f5f5]">
+                  Profilo Social Generico
+                </Label>
                 <Input
                   id="profiloSocial"
                   type="url"
@@ -158,22 +175,87 @@ export default function NewLeadPage() {
               </div>
             </div>
 
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="profiloFacebook" className="text-[#f5f5f5]">
+                  Facebook
+                </Label>
+                <Input
+                  id="profiloFacebook"
+                  type="url"
+                  value={form.profiloFacebook}
+                  onChange={(e) => set("profiloFacebook", e.target.value)}
+                  placeholder="https://facebook.com/..."
+                  className="bg-[#0d0d0d] border-[#1f1f1f] text-[#f5f5f5]"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="profiloInstagram" className="text-[#f5f5f5]">
+                  Instagram
+                </Label>
+                <Input
+                  id="profiloInstagram"
+                  type="url"
+                  value={form.profiloInstagram}
+                  onChange={(e) => set("profiloInstagram", e.target.value)}
+                  placeholder="https://instagram.com/..."
+                  className="bg-[#0d0d0d] border-[#1f1f1f] text-[#f5f5f5]"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="profiloLinkedIn" className="text-[#f5f5f5]">
+                  LinkedIn
+                </Label>
+                <Input
+                  id="profiloLinkedIn"
+                  type="url"
+                  value={form.profiloLinkedIn}
+                  onChange={(e) => set("profiloLinkedIn", e.target.value)}
+                  placeholder="https://linkedin.com/..."
+                  className="bg-[#0d0d0d] border-[#1f1f1f] text-[#f5f5f5]"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="profiloTikTok" className="text-[#f5f5f5]">
+                  TikTok
+                </Label>
+                <Input
+                  id="profiloTikTok"
+                  type="url"
+                  value={form.profiloTikTok}
+                  onChange={(e) => set("profiloTikTok", e.target.value)}
+                  placeholder="https://tiktok.com/..."
+                  className="bg-[#0d0d0d] border-[#1f1f1f] text-[#f5f5f5]"
+                />
+              </div>
+            </div>
+
             <div className="space-y-2">
               <Label className="text-[#f5f5f5]">Canale primo contatto</Label>
-              <Select value={form.canale} onValueChange={(v) => set("canale", v)}>
+              <Select
+                value={form.canale}
+                onValueChange={(v) => set("canale", v)}
+              >
                 <SelectTrigger className="bg-[#0d0d0d] border-[#1f1f1f] text-[#f5f5f5]">
                   <SelectValue placeholder="Seleziona canale" />
                 </SelectTrigger>
                 <SelectContent className="bg-[#141414] border-[#1f1f1f]">
                   {CANALI.map((c) => (
-                    <SelectItem key={c} value={c}>{c}</SelectItem>
+                    <SelectItem key={c} value={c}>
+                      {c}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="note" className="text-[#f5f5f5]">Note</Label>
+              <Label htmlFor="note" className="text-[#f5f5f5]">
+                Note
+              </Label>
               <Textarea
                 id="note"
                 value={form.note}
@@ -200,7 +282,8 @@ export default function NewLeadPage() {
               >
                 {loading ? (
                   <>
-                    <Loader2 size={16} className="mr-2 animate-spin" /> Creazione...
+                    <Loader2 size={16} className="mr-2 animate-spin" />{" "}
+                    Creazione...
                   </>
                 ) : (
                   "Crea Lead"
