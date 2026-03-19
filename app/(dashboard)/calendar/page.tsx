@@ -12,6 +12,8 @@ import {
   Tag,
   MoreVertical,
   X,
+  List,
+  Calendar as CalendarGrid,
 } from "lucide-react";
 import {
   format,
@@ -84,6 +86,7 @@ export default function CalendarPage() {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [viewMode, setViewMode] = useState<"month" | "agenda">("agenda");
 
   const [formData, setFormData] = useState({
     titolo: "",
@@ -199,16 +202,16 @@ export default function CalendarPage() {
 
   const renderHeader = () => {
     return (
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 md:mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-[#f5f5f5] capitalize">
+          <h1 className="text-2xl md:text-3xl font-bold text-[#f5f5f5] capitalize">
             {format(currentMonth, "MMMM yyyy", { locale: it })}
           </h1>
-          <p className="text-[#888] text-sm mt-1">
+          <p className="text-[#888] text-xs md:text-sm mt-1">
             Gestisci i tuoi appuntamenti e follow-up
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 md:gap-3">
           <div className="flex items-center bg-[#141414] rounded-lg border border-white/5 p-1">
             <Button
               variant="ghost"
@@ -222,7 +225,7 @@ export default function CalendarPage() {
               variant="ghost"
               size="sm"
               onClick={() => setCurrentMonth(new Date())}
-              className="text-xs px-3 text-[#f5f5f5]"
+              className="text-xs px-2 md:px-3 text-[#f5f5f5]"
             >
               Oggi
             </Button>
@@ -235,12 +238,41 @@ export default function CalendarPage() {
               <ChevronRight size={18} />
             </Button>
           </div>
+
+          <div className="flex items-center bg-[#141414] rounded-lg border border-white/5 p-1">
+            <Button
+              variant={viewMode === "agenda" ? "secondary" : "ghost"}
+              size="icon"
+              onClick={() => setViewMode("agenda")}
+              className={cn(
+                "h-8 w-8",
+                viewMode === "agenda"
+                  ? "bg-white/10 text-white"
+                  : "text-[#888]",
+              )}
+            >
+              <List size={18} />
+            </Button>
+            <Button
+              variant={viewMode === "month" ? "secondary" : "ghost"}
+              size="icon"
+              onClick={() => setViewMode("month")}
+              className={cn(
+                "h-8 w-8",
+                viewMode === "month" ? "bg-white/10 text-white" : "text-[#888]",
+              )}
+            >
+              <CalendarGrid size={18} />
+            </Button>
+          </div>
+
           <Button
             onClick={() => onDateClick(new Date())}
-            className="bg-[#c9a96e] hover:bg-[#b3915a] text-black gap-2"
+            className="bg-[#c9a96e] hover:bg-[#b3915a] text-black gap-2 h-9 md:h-10 text-xs md:text-sm ml-auto md:ml-0"
           >
             <Plus size={18} />
-            Nuovo Evento
+            <span className="hidden xs:inline">Nuovo Evento</span>
+            <span className="xs:hidden">Nuovo</span>
           </Button>
         </div>
       </div>
@@ -263,14 +295,105 @@ export default function CalendarPage() {
     );
   };
 
+  const renderAgenda = () => {
+    const monthStart = startOfMonth(currentMonth);
+    const monthEnd = endOfMonth(monthStart);
+    const startDate = monthStart;
+    const endDate = monthEnd;
+
+    const days = [];
+    let day = startDate;
+
+    while (day <= endDate) {
+      const cloneDay = day;
+      const dayEvents = visibleEvents.filter((e) =>
+        isSameDay(parseISO(e.inizio), cloneDay),
+      );
+
+      days.push(
+        <div
+          key={day.toString()}
+          className={cn(
+            "border-b border-white/5 p-4 transition-colors flex gap-4",
+            isToday(day) && "bg-[#c9a96e]/5",
+            dayEvents.length > 0 ? "opacity-100" : "opacity-40",
+          )}
+          onClick={() => onDateClick(cloneDay)}
+        >
+          <div className="flex flex-col items-center justify-start min-w-[40px]">
+            <span className="text-[10px] uppercase font-bold text-[#666]">
+              {format(day, "EEE", { locale: it })}
+            </span>
+            <span
+              className={cn(
+                "text-lg font-bold w-10 h-10 flex items-center justify-center rounded-full mt-1",
+                isToday(day) ? "bg-[#c9a96e] text-black" : "text-[#f5f5f5]",
+              )}
+            >
+              {format(day, "d")}
+            </span>
+          </div>
+
+          <div className="flex-1 space-y-2">
+            {dayEvents.length > 0 ? (
+              dayEvents.map((event: Event) => {
+                const typeInfo =
+                  EVENT_TYPES.find((t) => t.value === event.tipo) ||
+                  EVENT_TYPES[3];
+                return (
+                  <div
+                    key={event.id}
+                    onClick={(e: React.MouseEvent) => {
+                      e.stopPropagation();
+                      onEventClick(event);
+                    }}
+                    className={cn(
+                      "p-3 rounded-lg border bg-[#141414]/50 cursor-pointer hover:scale-[1.01] transition-transform",
+                      typeInfo.color,
+                    )}
+                  >
+                    <div className="flex justify-between items-start mb-1">
+                      <span className="text-sm font-semibold truncate pr-2">
+                        {event.titolo}
+                      </span>
+                      <span className="text-[10px] opacity-70 flex-shrink-0">
+                        {format(parseISO(event.inizio), "HH:mm")}
+                      </span>
+                    </div>
+                    {event.note && (
+                      <p className="text-xs opacity-60 line-clamp-1 italic">
+                        {event.note}
+                      </p>
+                    )}
+                  </div>
+                );
+              })
+            ) : (
+              <div className="h-full flex items-center italic text-[#444] text-xs">
+                Nessun evento
+              </div>
+            )}
+          </div>
+        </div>,
+      );
+      day = addDays(day, 1);
+    }
+
+    return (
+      <div className="border border-white/5 rounded-xl overflow-hidden bg-[#141414]/20 flex flex-col">
+        {days}
+      </div>
+    );
+  };
+
   const renderCells = () => {
     const monthStart = startOfMonth(currentMonth);
     const monthEnd = endOfMonth(monthStart);
-    const startDate = startOfWeek(monthStart);
-    const endDate = endOfWeek(monthEnd);
+    const startDate = startOfWeek(monthStart, { weekStartsOn: 0 }); // Sunday start to match header
+    const endDate = endOfWeek(monthEnd, { weekStartsOn: 6 });
 
     const rows = [];
-    let days = [];
+    let daysList = [];
     let day = startDate;
     let formattedDate = "";
 
@@ -282,11 +405,11 @@ export default function CalendarPage() {
           isSameDay(parseISO(e.inizio), cloneDay),
         );
 
-        days.push(
+        daysList.push(
           <div
             key={day.toString()}
             className={cn(
-              "min-h-[120px] border border-white/5 p-2 transition-colors relative flex flex-col group",
+              "min-h-[80px] md:min-h-[120px] border border-white/5 p-1 md:p-2 transition-colors relative flex flex-col group",
               !isSameMonth(day, monthStart)
                 ? "bg-[#0a0a0a]/50 opacity-30"
                 : "bg-[#141414]/30 hover:bg-[#1f1f1f]/50",
@@ -310,19 +433,19 @@ export default function CalendarPage() {
             </div>
 
             <div className="flex-1 space-y-1 overflow-y-auto custom-scrollbar">
-              {dayEvents.map((event) => {
+              {dayEvents.map((event: Event) => {
                 const typeInfo =
                   EVENT_TYPES.find((t) => t.value === event.tipo) ||
                   EVENT_TYPES[3];
                 return (
                   <div
                     key={event.id}
-                    onClick={(e) => {
+                    onClick={(e: React.MouseEvent) => {
                       e.stopPropagation();
                       onEventClick(event);
                     }}
                     className={cn(
-                      "px-2 py-1 rounded text-[10px] truncate border cursor-pointer transition-transform hover:scale-[1.02]",
+                      "px-1 md:px-2 py-0.5 md:py-1 rounded text-[8px] md:text-[10px] truncate border cursor-pointer transition-transform hover:scale-[1.02]",
                       typeInfo.color,
                       event.membro !== userEmail &&
                         role !== "admin" &&
@@ -342,10 +465,10 @@ export default function CalendarPage() {
       }
       rows.push(
         <div className="grid grid-cols-7" key={day.toString()}>
-          {days}
+          {daysList}
         </div>,
       );
-      days = [];
+      daysList = [];
     }
     return (
       <div className="border border-white/5 rounded-xl overflow-hidden shadow-2xl">
@@ -355,21 +478,26 @@ export default function CalendarPage() {
   };
 
   return (
-    <div className="p-8 max-w-[1400px] mx-auto animate-in fade-in duration-500">
+    <div className="p-4 md:p-8 max-w-[1400px] mx-auto animate-in fade-in duration-500">
       {renderHeader()}
 
-      <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 md:gap-8">
         <div className="xl:col-span-3">
-          {renderDays()}
+          {viewMode === "month" && <div>{renderDays()}</div>}
+
           {loading ? (
-            <div className="min-h-[600px] flex items-center justify-center border border-white/5 rounded-xl bg-[#141414]/20">
+            <div className="min-h-[400px] md:min-h-[600px] flex items-center justify-center border border-white/5 rounded-xl bg-[#141414]/20">
               <div className="flex flex-col items-center gap-4">
                 <div className="h-8 w-8 border-2 border-[#c9a96e] border-t-transparent rounded-full animate-spin" />
                 <p className="text-[#888] text-sm">Caricamento calendario...</p>
               </div>
             </div>
+          ) : viewMode === "month" ? (
+            <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+              {renderCells()}
+            </div>
           ) : (
-            renderCells()
+            renderAgenda()
           )}
         </div>
 
@@ -384,9 +512,9 @@ export default function CalendarPage() {
             <CardContent className="pt-4 px-3">
               <div className="space-y-4">
                 {visibleEvents
-                  .filter((e) => new Date(e.inizio) >= new Date())
+                  .filter((e: Event) => new Date(e.inizio) >= new Date())
                   .slice(0, 5)
-                  .map((e) => {
+                  .map((e: Event) => {
                     const typeInfo =
                       EVENT_TYPES.find((t) => t.value === e.tipo) ||
                       EVENT_TYPES[3];
@@ -453,7 +581,7 @@ export default function CalendarPage() {
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="bg-[#0f0f0f] border-white/10 text-[#f5f5f5] max-w-md">
+        <DialogContent className="bg-[#0f0f0f] border-white/10 text-[#f5f5f5] w-[95vw] max-w-md rounded-2xl p-6 overflow-y-auto max-h-[90vh]">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold flex items-center gap-2">
               {selectedEvent ? "Modifica Evento" : "Nuovo Evento"}

@@ -11,6 +11,9 @@ export interface Lead {
   profiloSocial: string;
   profiloSocial2: string;
   profiloSocial3: string;
+  profiloInstagram: string;
+  profiloFacebook: string;
+  profiloLinkedIn: string;
   profiloTikTok: string;
   canale: string;
   note: string;
@@ -121,6 +124,9 @@ function mapLeadFromSupabase(row: any): Lead {
     profiloSocial: row.profilo_social || "",
     profiloSocial2: row.profilo_social_2 || "",
     profiloSocial3: row.profilo_social_3 || "",
+    profiloInstagram: row.profilo_instagram || "",
+    profiloFacebook: row.profilo_facebook || "",
+    profiloLinkedIn: row.profilo_linkedin || "",
     profiloTikTok: row.profilo_tiktok || "",
     canale: row.canale || "",
     note: row.note || "",
@@ -262,6 +268,9 @@ export async function createLead(lead: Partial<Lead>): Promise<Lead> {
       profilo_social: lead.profiloSocial,
       profilo_social_2: lead.profiloSocial2,
       profilo_social_3: lead.profiloSocial3,
+      profilo_instagram: lead.profiloInstagram,
+      profilo_facebook: lead.profiloFacebook,
+      profilo_linkedin: lead.profiloLinkedIn,
       profilo_tiktok: lead.profiloTikTok,
       canale: lead.canale,
       note: lead.note,
@@ -294,6 +303,9 @@ export async function createLeads(leads: any[]): Promise<Lead[]> {
       profilo_social: l.profiloSocial,
       profilo_social_2: l.profiloSocial2,
       profilo_social_3: l.profiloSocial3,
+      profilo_instagram: l.profiloInstagram,
+      profilo_facebook: l.profiloFacebook,
+      profilo_linkedin: l.profiloLinkedIn,
       profilo_tiktok: l.profiloTikTok,
       canale: l.canale,
       note: l.note,
@@ -314,6 +326,9 @@ export async function updateLead(id: string, updates: Partial<Lead>): Promise<Le
   if (updates.profiloSocial !== undefined) mappedUpdates.profilo_social = updates.profiloSocial;
   if (updates.profiloSocial2 !== undefined) mappedUpdates.profilo_social_2 = updates.profiloSocial2;
   if (updates.profiloSocial3 !== undefined) mappedUpdates.profilo_social_3 = updates.profiloSocial3;
+  if (updates.profiloInstagram !== undefined) mappedUpdates.profilo_instagram = updates.profiloInstagram;
+  if (updates.profiloFacebook !== undefined) mappedUpdates.profilo_facebook = updates.profiloFacebook;
+  if (updates.profiloLinkedIn !== undefined) mappedUpdates.profilo_linkedin = updates.profiloLinkedIn;
   if (updates.profiloTikTok !== undefined) mappedUpdates.profilo_tiktok = updates.profiloTikTok;
   if (updates.canale !== undefined) mappedUpdates.canale = updates.canale;
   if (updates.note !== undefined) mappedUpdates.note = updates.note;

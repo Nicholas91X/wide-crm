@@ -4,7 +4,20 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Plus, MoreHorizontal, List, Columns, Filter, Sparkles, GripVertical, Download } from "lucide-react";
+import {
+  Plus,
+  MoreHorizontal,
+  List,
+  Columns,
+  Filter,
+  Sparkles,
+  GripVertical,
+  Download,
+  Instagram,
+  Facebook,
+  Linkedin,
+  Globe,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
@@ -36,11 +49,36 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 
 function exportLeadsCSV(leads: Lead[]) {
-  const headers = ["Nome Azienda", "Settore", "Territorio", "Stato", "Score", "Canale", "Data primo contatto", "Data follow-up", "Risposta", "Sito Web", "Inserito da"];
-  const rows = leads.map(l => [
-    l.nomeAzienda, l.settore, l.territorio, l.stato, l.score, l.canale,
-    l.dataPrimoContatto, l.dataFollowUp, l.risposta, l.sitoWeb, l.inseritoDA,
-  ].map(v => `"${(v || "").replace(/"/g, '""')}"`).join(","));
+  const headers = [
+    "Nome Azienda",
+    "Settore",
+    "Territorio",
+    "Stato",
+    "Score",
+    "Canale",
+    "Data primo contatto",
+    "Data follow-up",
+    "Risposta",
+    "Sito Web",
+    "Inserito da",
+  ];
+  const rows = leads.map((l) =>
+    [
+      l.nomeAzienda,
+      l.settore,
+      l.territorio,
+      l.stato,
+      l.score,
+      l.canale,
+      l.dataPrimoContatto,
+      l.dataFollowUp,
+      l.risposta,
+      l.sitoWeb,
+      l.inseritoDA,
+    ]
+      .map((v) => `"${(v || "").replace(/"/g, '""')}"`)
+      .join(","),
+  );
   const csv = [headers.join(","), ...rows].join("\n");
   const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
@@ -161,7 +199,9 @@ export default function PipelinePage() {
 
   async function moveCard(leadId: string, newStato: string) {
     const original = leads.find((l) => l.id === leadId)?.stato;
-    setLeads((prev) => prev.map((l) => l.id === leadId ? { ...l, stato: newStato } : l));
+    setLeads((prev) =>
+      prev.map((l) => (l.id === leadId ? { ...l, stato: newStato } : l)),
+    );
     try {
       const res = await fetch(`/api/leads/${leadId}`, {
         method: "PATCH",
@@ -171,7 +211,10 @@ export default function PipelinePage() {
       if (!res.ok) throw new Error();
       toast.success(`Spostato in "${newStato}"`);
     } catch {
-      if (original) setLeads((prev) => prev.map((l) => l.id === leadId ? { ...l, stato: original } : l));
+      if (original)
+        setLeads((prev) =>
+          prev.map((l) => (l.id === leadId ? { ...l, stato: original } : l)),
+        );
       toast.error("Errore nello spostamento");
     }
   }
@@ -376,6 +419,8 @@ function TableView({
                 "Territorio",
                 "Score",
                 "Stato",
+                "Social",
+                "Sito",
                 "1° Contatto",
                 "Follow-up",
                 "",
@@ -411,6 +456,69 @@ function TableView({
                 </td>
                 <td className="px-4 py-4 text-xs font-bold text-[#c9a96e]">
                   {lead.score || "-"}
+                </td>
+                <td className="px-4 py-4">
+                  <div className="flex items-center gap-1.5">
+                    {lead.profiloInstagram && (
+                      <a
+                        href={
+                          lead.profiloInstagram.startsWith("http")
+                            ? lead.profiloInstagram
+                            : `https://${lead.profiloInstagram}`
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[#555] hover:text-[#c9a96e] transition-colors"
+                      >
+                        <Instagram size={14} />
+                      </a>
+                    )}
+                    {lead.profiloFacebook && (
+                      <a
+                        href={
+                          lead.profiloFacebook.startsWith("http")
+                            ? lead.profiloFacebook
+                            : `https://${lead.profiloFacebook}`
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[#555] hover:text-[#c9a96e] transition-colors"
+                      >
+                        <Facebook size={14} />
+                      </a>
+                    )}
+                    {lead.profiloLinkedIn && (
+                      <a
+                        href={
+                          lead.profiloLinkedIn.startsWith("http")
+                            ? lead.profiloLinkedIn
+                            : `https://${lead.profiloLinkedIn}`
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[#555] hover:text-[#c9a96e] transition-colors"
+                      >
+                        <Linkedin size={14} />
+                      </a>
+                    )}
+                  </div>
+                </td>
+                <td className="px-4 py-4 text-[#555]">
+                  {lead.sitoWeb && (
+                    <a
+                      href={
+                        lead.sitoWeb.startsWith("http")
+                          ? lead.sitoWeb
+                          : `https://${lead.sitoWeb}`
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title={lead.sitoWeb}
+                      className="hover:text-[#c9a96e] transition-colors"
+                    >
+                      <Globe size={14} />
+                    </a>
+                  )}
                 </td>
                 <td className="px-4 py-4">
                   <StatoBadge stato={lead.stato} />
@@ -561,7 +669,7 @@ function KanbanView({
   onMoveCard?: (id: string, newStato: string) => void;
 }) {
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
   );
 
   function handleDragEnd(event: DragEndEvent) {
@@ -579,7 +687,12 @@ function KanbanView({
       <div className="overflow-x-auto pb-6">
         <div className="flex gap-3 min-w-max">
           {KANBAN_COLS.map((col) => (
-            <KanbanColumn key={col} col={col} leads={leads.filter((l) => l.stato === col)} canDrag={!!onMoveCard} />
+            <KanbanColumn
+              key={col}
+              col={col}
+              leads={leads.filter((l) => l.stato === col)}
+              canDrag={!!onMoveCard}
+            />
           ))}
         </div>
       </div>
@@ -598,20 +711,34 @@ const KANBAN_COL_ACCENT: Record<string, string> = {
   "Non interessato": "border-red-900/50",
 };
 
-function KanbanColumn({ col, leads, canDrag }: { col: string; leads: Lead[]; canDrag: boolean }) {
+function KanbanColumn({
+  col,
+  leads,
+  canDrag,
+}: {
+  col: string;
+  leads: Lead[];
+  canDrag: boolean;
+}) {
   const { isOver, setNodeRef } = useDroppable({ id: col });
 
   return (
     <div className="w-56 flex-shrink-0 flex flex-col">
       <div className="flex items-center justify-between mb-2 px-1">
-        <h3 className="text-[10px] font-bold text-[#555] uppercase tracking-wider truncate pr-2">{col}</h3>
-        <span className="text-[10px] bg-[#1a1a1a] text-[#555] rounded-full px-2 py-0.5 flex-shrink-0">{leads.length}</span>
+        <h3 className="text-[10px] font-bold text-[#555] uppercase tracking-wider truncate pr-2">
+          {col}
+        </h3>
+        <span className="text-[10px] bg-[#1a1a1a] text-[#555] rounded-full px-2 py-0.5 flex-shrink-0">
+          {leads.length}
+        </span>
       </div>
       <div
         ref={setNodeRef}
         className={cn(
           "flex-1 space-y-2 min-h-[120px] rounded-xl p-2 transition-colors border",
-          isOver ? "bg-[#c9a96e]/5 border-[#c9a96e]/20" : "bg-[#0d0d0d] border-white/5"
+          isOver
+            ? "bg-[#c9a96e]/5 border-[#c9a96e]/20"
+            : "bg-[#0d0d0d] border-white/5",
         )}
       >
         {leads.map((lead) => (
@@ -629,11 +756,12 @@ function KanbanColumn({ col, leads, canDrag }: { col: string; leads: Lead[]; can
 
 function KanbanCard({ lead, canDrag }: { lead: Lead; canDrag: boolean }) {
   const router = useRouter();
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-    id: lead.id,
-    data: { stato: lead.stato },
-    disabled: !canDrag,
-  });
+  const { attributes, listeners, setNodeRef, transform, isDragging } =
+    useDraggable({
+      id: lead.id,
+      data: { stato: lead.stato },
+      disabled: !canDrag,
+    });
 
   const style = transform
     ? { transform: CSS.Translate.toString(transform), zIndex: 50 }
@@ -645,7 +773,7 @@ function KanbanCard({ lead, canDrag }: { lead: Lead; canDrag: boolean }) {
       style={style}
       className={cn(
         "bg-[#141414] border border-[#1f1f1f] rounded-lg p-3 group hover:border-[#c9a96e]/30 transition-colors relative",
-        isDragging && "opacity-40 shadow-2xl"
+        isDragging && "opacity-40 shadow-2xl",
       )}
     >
       {canDrag && (
@@ -662,19 +790,34 @@ function KanbanCard({ lead, canDrag }: { lead: Lead; canDrag: boolean }) {
         className="text-left w-full pr-4"
         onClick={() => router.push(`/pipeline/${lead.id}`)}
       >
-        <p className="text-xs font-semibold text-[#f5f5f5] truncate leading-tight">{lead.nomeAzienda}</p>
+        <p className="text-xs font-semibold text-[#f5f5f5] truncate leading-tight">
+          {lead.nomeAzienda}
+        </p>
         {lead.settore && (
-          <p className="text-[10px] text-[#555] mt-0.5 truncate">{lead.settore}</p>
+          <p className="text-[10px] text-[#555] mt-0.5 truncate">
+            {lead.settore}
+          </p>
         )}
         {lead.territorio && (
           <p className="text-[10px] text-[#444] truncate">{lead.territorio}</p>
         )}
         <div className="flex items-center justify-between mt-2">
-          {lead.score ? (
-            <span className="text-[10px] text-[#c9a96e] font-bold">{lead.score}</span>
-          ) : <span />}
+          <div className="flex items-center gap-1">
+            {lead.profiloInstagram && (
+              <Instagram size={11} className="text-[#333]" />
+            )}
+            {lead.profiloFacebook && (
+              <Facebook size={11} className="text-[#333]" />
+            )}
+            {lead.profiloLinkedIn && (
+              <Linkedin size={11} className="text-[#333]" />
+            )}
+            {lead.sitoWeb && <Globe size={11} className="text-[#333]" />}
+          </div>
           {lead.dataFollowUp && (
-            <span className="text-[9px] text-[#444]">{formatDate(lead.dataFollowUp)}</span>
+            <span className="text-[9px] text-[#444]">
+              {formatDate(lead.dataFollowUp)}
+            </span>
           )}
         </div>
       </button>

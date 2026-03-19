@@ -11,6 +11,9 @@ export interface Lead {
   profiloSocial: string;
   profiloSocial2: string;
   profiloSocial3: string;
+  profiloInstagram: string;
+  profiloFacebook: string;
+  profiloLinkedIn: string;
   profiloTikTok: string;
   canale: string;
   note: string;

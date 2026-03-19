@@ -9,6 +9,7 @@ import {
   Users,
   Settings,
   Sparkles,
+  Calendar,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSession } from "next-auth/react";
@@ -19,6 +20,7 @@ const navItems = [
   { href: "/leads", label: "Leads", icon: Sparkles },
   { href: "/pipeline", label: "Pipeline", icon: GitBranch },
   { href: "/reports", label: "Report", icon: FileText },
+  { href: "/calendar", label: "Calendario", icon: Calendar },
   { href: "/clients", label: "Clienti", icon: Users },
 ];
 

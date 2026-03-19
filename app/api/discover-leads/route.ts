@@ -79,14 +79,13 @@ function parseLeadsFromText(text: string): any[] {
 // ─── Shared output rules ──────────────────────────────────────────────────────
 
 const OUTPUT_RULES = `FORMATO OUTPUT — rispetta queste regole alla lettera:
-- Per ogni azienda scrivi ESATTAMENTE su una singola riga (nessuna interruzione di riga nel JSON):
-  __LEAD__:{"nomeAzienda":"...","settore":"...","territorio":"...","sitoWeb":"...","profiloSocial":"...","profiloTikTok":"...","note":"..."}
+- Per ogni azienda scrivi ESATTAMENTE su una singola riga:
+  __LEAD__:{"nomeAzienda":"...","settore":"...","territorio":"...","sitoWeb":"...","profiloInstagram":"...","profiloFacebook":"...","profiloLinkedIn":"...","profiloTikTok":"...","note":"..."}
 - JSON valido e compatto su una sola riga
 - Campi obbligatori: nomeAzienda, settore, territorio
 - sitoWeb: URL completo con https:// se disponibile, altrimenti ""
-- profiloSocial: PRIORITÀ MASSIMA. Trova l'URL del profilo social più attivo (Instagram, Facebook o LinkedIn). Se ne trovi più di uno, metti il più rilevante per il marketing. Se nessuno, lascia ""
-- profiloTikTok: URL del profilo TikTok se disponibile, altrimenti ""
-- note: Breve analisi della presenza digitale (es. "Sito moderno ma social inattivi", "Ottimo IG, sito mancante", "Nessuna traccia digital")
+- profiloInstagram/profiloFacebook/profiloLinkedIn/profiloTikTok: URL completi se trovati, altrimenti ""
+- note: Breve analisi della presenza digitale (es. "Forte su social ma sito datato", "Nessuna presenza digital")
 - NON scrivere nulla al di fuori delle righe __LEAD__:`;
 
 // ─── System prompts per tier ──────────────────────────────────────────────────
