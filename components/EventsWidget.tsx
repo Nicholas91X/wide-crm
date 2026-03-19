@@ -80,39 +80,34 @@ export function EventsWidget({ events }: { events: Event[] }) {
 
   return (
     <div className="glass-dark border border-white/5 rounded-xl p-5 flex flex-col h-full">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-4 shrink-0">
         <h2 className="text-sm font-bold text-[#f5f5f5] flex items-center gap-2">
           <CalendarIcon size={16} className="text-[#c9a96e]" />
           Prossimi Eventi
         </h2>
-        {totalPages > 1 && (
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={prevPage}
-              disabled={currentPage === 0}
-              className="h-6 w-6 text-[#ccc] disabled:opacity-30"
-            >
-              <ChevronLeft size={16} />
-            </Button>
-            <span className="text-[10px] text-[#888]">
-              {currentPage + 1} / {totalPages}
-            </span>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={nextPage}
-              disabled={currentPage >= totalPages - 1}
-              className="h-6 w-6 text-[#ccc] disabled:opacity-30"
-            >
-              <ChevronRight size={16} />
-            </Button>
-          </div>
-        )}
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={prevPage}
+            disabled={currentPage === 0}
+            className="h-7 w-7 text-[#ccc] hover:bg-white/5 hover:text-white disabled:opacity-20"
+          >
+            <ChevronLeft size={16} />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={nextPage}
+            disabled={currentPage >= totalPages - 1}
+            className="h-7 w-7 text-[#ccc] hover:bg-white/5 hover:text-white disabled:opacity-20"
+          >
+            <ChevronRight size={16} />
+          </Button>
+        </div>
       </div>
 
-      <div className="flex-1 space-y-3">
+      <div className="flex-1 min-h-[380px] space-y-3">
         {upcomingEvents.length === 0 ? (
           <div className="h-full flex items-center justify-center py-6">
             <p className="text-[#999] text-xs text-center">
@@ -141,24 +136,46 @@ export function EventsWidget({ events }: { events: Event[] }) {
                     {event.tipo}
                   </span>
                 </div>
-                <div className="flex items-center justify-between mt-2">
-                  <div className="flex items-center gap-1.5 text-[10px] text-[#ccc]">
-                    <Clock size={12} className="text-[#888]" />
-                    {format(parseISO(event.inizio), "d MMM, HH:mm", {
-                      locale: it,
-                    })}
+                <div className="flex flex-col gap-2 mt-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5 text-[10px] text-[#ccc]">
+                      <Clock size={12} className="text-[#c9a96e]" />
+                      {format(parseISO(event.inizio), "d MMM, HH:mm", {
+                        locale: it,
+                      })}
+                    </div>
+                    <div className="flex items-center gap-1.5 text-[10px] text-[#aaa]">
+                      <MapPin size={12} className="text-[#888]" />
+                      {event.membro.split("@")[0]}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1.5 text-[10px] text-[#aaa]">
-                    <MapPin size={12} className="text-[#888]" />
-                    {/* Placeholder user name/email to visualize ownership directly on widget */}
-                    {event.membro.split("@")[0]}
-                  </div>
+                  {event.collaboratori && (
+                    <div className="flex items-center gap-1.5 text-[10px] text-[#888] italic bg-white/[0.03] px-1.5 py-0.5 rounded-sm w-fit">
+                      <Tag size={10} className="opacity-50" />+{" "}
+                      {event.collaboratori}
+                    </div>
+                  )}
                 </div>
               </div>
             );
           })
         )}
       </div>
+
+      {totalPages > 1 && (
+        <div className="mt-4 flex justify-center gap-1.5 shrink-0">
+          {Array.from({ length: totalPages }).map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentPage(i)}
+              className={cn(
+                "h-1 rounded-full transition-all duration-300",
+                currentPage === i ? "w-4 bg-[#c9a96e]" : "w-1.5 bg-white/10",
+              )}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

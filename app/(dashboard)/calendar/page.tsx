@@ -433,9 +433,15 @@ export default function CalendarPage() {
                       </span>
                     </div>
                     {event.note && (
-                      <p className="text-xs opacity-60 line-clamp-1 italic">
+                      <p className="text-xs opacity-60 line-clamp-1 italic mb-1">
                         {event.note}
                       </p>
+                    )}
+                    {event.collaboratori && (
+                      <div className="flex items-center gap-1 text-[10px] opacity-80 mt-1">
+                        <User size={10} />
+                        <span className="italic">+ {event.collaboratori}</span>
+                      </div>
                     )}
                   </div>
                 );
